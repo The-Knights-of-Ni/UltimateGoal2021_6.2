@@ -109,19 +109,25 @@ public class Auto_Blue extends LinearOpMode {
             robot.drive.moveRight(22.75/2*mmPerInch);
         }
 
-        // deploy claw
+        // deploy claw and drop wobble goal
+        robot.control.deployWobble();
+        robot.control.openWobbleClaw();
+        robot.control.retractWobble();
+        robot.control.closeWobbleClaw();
 
         if(numRings.equals("ZERO")) {
             // align robot
         }
         else if(numRings.equals("ONE")) {
             robot.drive.moveBackward((94.25-70.75)*mmPerInch);
-            robot.drive.strafe((int)(-22.75/2*mmPerInch));
+            robot.drive.moveLeft(22.75/2*mmPerInch);
         }
         else {
             robot.drive.moveBackward((117.75-70.75)*mmPerInch);
-            robot.drive.strafe((int)(22.75/2*mmPerInch));
+            robot.drive.moveRight(22.75/2*mmPerInch);
         }
+
+        robot.drive.moveBackward(22.75/2 * mmPerInch);
 
         // launch rings
         launchRings();
@@ -133,5 +139,7 @@ public class Auto_Blue extends LinearOpMode {
         // align robot
         // detect high goal with vision
         // launch rings to high goal
+
+        // this should prob be in control tbh, but we can figure that out once launcher is operational
     }
 }
