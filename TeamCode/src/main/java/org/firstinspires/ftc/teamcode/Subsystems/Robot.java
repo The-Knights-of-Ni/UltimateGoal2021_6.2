@@ -37,8 +37,8 @@ public class Robot extends Subsystem {
 
     //Servos
 
-    public CRServo elevator1;
-    public CRServo elevator2;
+    public Servo elevatorR;
+    public Servo elevatorL;
 
     public Servo wobbleClaw;
     public Servo wobbleGoalArm;
@@ -224,6 +224,10 @@ public class Robot extends Subsystem {
         intakeToElevatorL = hardwareMap.servo.get("iteL");
 
 
+        elevatorR = hardwareMap.servo.get("elevatorR");
+        elevatorL = hardwareMap.servo.get("elevatorL");
+
+
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -257,7 +261,7 @@ public class Robot extends Subsystem {
 //        control = new Control(intake, launch1, launch2, imu, opMode, timer, wobbleClaw, wobbleGoalArm);
 //        control = new Control(intake, launch1, launch2a, launch2b, imu, opMode, timer, wobbleClaw, wobbleGoalArm);
         control = new Control(intake, launch1, launch2a, launch2b, imu, opMode, timer,
-                wobbleClaw, wobbleGoalArm, intakeToElevatorR, intakeToElevatorL, launcherFeederR, launcherFeederL);
+                wobbleClaw, wobbleGoalArm, intakeToElevatorR, intakeToElevatorL, launcherFeederR, launcherFeederL, elevatorR, elevatorL);
 
 
         opMode.telemetry.addData("Mode", " vision initializing...");

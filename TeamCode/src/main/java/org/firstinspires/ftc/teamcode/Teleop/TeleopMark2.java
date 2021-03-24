@@ -159,8 +159,30 @@ public class TeleopMark2 extends LinearOpMode {
 
             //Intake to elevator
             if (robot.bumperRight && !robot.isrBumperPressedPrev){
-                robot.control.closeIntakeToElevator();
-                robot.control.openIntakeToElevator();
+                if(isIntakeToElevator){
+                    isIntakeToElevator = false;
+                }
+                else{
+                    robot.control.closeIntakeToElevator();
+                    robot.control.openIntakeToElevator();
+                    isIntakeToElevator = true;
+                }
+
+            }
+
+            if((robot.triggerLeft > 0.3)){
+                if(isLauncherFeeder){
+                    isLauncherFeeder = false;
+                }
+                else{
+                    robot.control.openLauncherFeeder();
+                    robot.control.closeLauncherFeeder();
+                    isLauncherFeeder = true;
+                }
+            }
+
+            if(robot.dPadUp && !robot.isdPadUpPressedPrev){
+
             }
 
 

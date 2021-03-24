@@ -24,14 +24,16 @@ public class Control extends Subsystem {
     private DcMotorEx launch2b;
 
     //Servos
-    public Servo elevator1;
-    public Servo elevator2;
+    public Servo elevatorR;
+    public Servo elevatorL;
     private Servo wobbleClaw;
     private Servo wobbleGoalArm;
     private Servo intakeToElevatorL;
     private Servo intakeToElevatorR;
     private Servo launcherFeederL;
     private Servo launcherFeederR;
+
+
     //Sensors
     private BNO055IMU imu;
 
@@ -107,6 +109,15 @@ public class Control extends Subsystem {
     private static final double     LAUNCHER_FEEDER_R_CLOSE      = 0.0;
     private static final double     LAUNCHER_FEEDER_L_OPEN       = 0.0;
     private static final double     LAUNCHER_FEEDER_L_CLOSE      = 0.0;
+    private static final double     ELEVATOR_BOTTOM_POS_R         = 0.0;
+    private static final double     ELEVATOR_BOTTOM_POS_L         = 0.0;
+    private static final double     ELEVATOR_1RING_POS_R          = 0.0;
+    private static final double     ELEVATOR_1RING_POS_L          = 0.0;
+    private static final double     ELEVATOR_2RING_POS_R          = 0.0;
+    private static final double     ELEVATOR_2RING_POS_L          = 0.0;
+    private static final double     ELEVATOR_3RING_POS_R          = 0.0;
+    private static final double     ELEVATOR_3RING_POS_L          = 0.0;
+
 
 
 
@@ -118,6 +129,16 @@ public class Control extends Subsystem {
     private double mainArmLengthTick = 0.0;
     private boolean mainClawArmTrackingMode = false;
     private double ClawRotationAngle = 0.0;
+
+    private int elevatorStage = 0;
+    /**
+     * 0 = BOTTOM
+     * 1 = 3 Rings position
+     * 2 = 2 Rings position
+     * 3 = 1 Ring position
+     */
+
+
 
 //    public Control(DcMotorEx intake, DcMotorEx launch1, DcMotorEx launch2, BNO055IMU imu, LinearOpMode opMode, ElapsedTime timer, ) {
     public Control(DcMotorEx intake, DcMotorEx launch1, DcMotorEx launch2a, DcMotorEx launch2b, BNO055IMU imu, LinearOpMode opMode, ElapsedTime timer, Servo wobbleClaw, Servo wobbleGoalArm) {
@@ -140,7 +161,7 @@ public class Control extends Subsystem {
     }
 
     public Control(DcMotorEx intake, DcMotorEx launch1, DcMotorEx launch2a, DcMotorEx launch2b, BNO055IMU imu, LinearOpMode opMode, ElapsedTime timer,
-                   Servo wobbleClaw, Servo wobbleGoalArm, Servo intakeToElevatorR, Servo intakeToElevatorL, Servo launcherFeederR, Servo launcherFeederL) {
+                   Servo wobbleClaw, Servo wobbleGoalArm, Servo intakeToElevatorR, Servo intakeToElevatorL, Servo launcherFeederR, Servo launcherFeederL, Servo elevatorR, Servo elevatorL) {
 
         // store device information locally
         this.wobbleClaw = wobbleClaw;
@@ -148,7 +169,10 @@ public class Control extends Subsystem {
         this.intakeToElevatorR = intakeToElevatorR;
         this.intakeToElevatorL = intakeToElevatorL;
         this.launcherFeederR = launcherFeederR;
-        this.launcherFeederR = launcherFeederL;
+        this.launcherFeederL = launcherFeederL;
+        this.elevatorR = elevatorR;
+        this.elevatorL = elevatorL;
+
         this.intake = intake;
         this.launch1 = launch1;
         this.launch2a = launch2a;
@@ -282,6 +306,39 @@ public class Control extends Subsystem {
             launch1.setPower(-launchPower);
             launch2a.setPower(-launchPower);
             launch2b.setPower(-launchPower);
+    }
+
+    public int getElevatorStage(){
+        return elevatorStage;
+    }
+
+    public void moveElevator(int x){
+        int newElevatorStage = elevatorStage + x;
+        if(newElevatorStage > 3){
+            newElevatorStage = 3;
+        }
+        if(newElevatorStage < 0){
+            newElevatorStage = 0;
+        }
+        elevatorStage = newElevatorStage;
+        switch(elevatorStage){
+            case 0:
+                elevatorR.setPosition(ELEVATOR_BOTTOM_POS_R);
+                elevatorL.setPosition(ELEVATOR_BOTTOM_POS_L);
+                break;
+            case 1:
+                elevatorR.setPosition(ELEVATOR_3RING_POS_R);
+                elevatorL.setPosition(ELEVATOR_3RING_POS_L);
+                break;
+            case 2:
+                elevatorR.setPosition(ELEVATOR_2RING_POS_R);
+                elevatorL.setPosition(ELEVATOR_2RING_POS_L);
+                break;
+            case 3:
+                elevatorR.setPosition(ELEVATOR_1RING_POS_R);
+                elevatorL.setPosition(ELEVATOR_1RING_POS_L);
+                break;
+        }
     }
 
 

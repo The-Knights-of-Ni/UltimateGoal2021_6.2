@@ -55,25 +55,103 @@ public class ServoTest extends LinearOpMode {
             //Get the current time
             timeCurrent = timer.nanoseconds();
 
-            // test main arm servos
+            // elevator
             if (robot.triggerLeft2 > 0.5) {
-                robot.wobbleClaw.setPosition(robot.wobbleClaw.getPosition() + 0.005);
+                robot.elevatorL.setPosition(robot.elevatorL.getPosition() + 0.005);
             }
             else if (robot.triggerLeft2 > 0.1){
-                robot.wobbleClaw.setPosition(robot.wobbleClaw.getPosition() + 0.001);
+                robot.elevatorL.setPosition(robot.elevatorL.getPosition() + 0.001);
             }
             else if (robot.triggerRight2 > 0.5){
-                robot.wobbleClaw.setPosition(robot.wobbleClaw.getPosition() - 0.005);
+                robot.elevatorL.setPosition(robot.elevatorL.getPosition() - 0.005);
             }
             else if (robot.triggerRight2 > 0.1){
-                robot.wobbleClaw.setPosition(robot.wobbleClaw.getPosition() - 0.001);
+                robot.elevatorL.setPosition(robot.elevatorL.getPosition() - 0.001);
             }
+
+            if (robot.triggerLeft > 0.5) {
+                robot.elevatorR.setPosition(robot.elevatorR.getPosition() + 0.005);
+            }
+            else if (robot.triggerLeft > 0.1){
+                robot.elevatorR.setPosition(robot.elevatorR.getPosition() + 0.001);
+            }
+            else if (robot.triggerRight > 0.5){
+                robot.elevatorR.setPosition(robot.elevatorR.getPosition() - 0.005);
+            }
+            else if (robot.triggerRight > 0.1){
+                robot.elevatorR.setPosition(robot.elevatorR.getPosition() - 0.001);
+            }
+
+            //intake to elevator
+            if(robot.leftStickY > 0.5){
+                robot.intakeToElevatorL.setPosition(robot.elevatorL.getPosition() + 0.005);
+            }
+            else if((robot.leftStickY <= 0.5) && (robot.leftStickY > 0.05)){
+                robot.intakeToElevatorL.setPosition(robot.elevatorL.getPosition() + 0.001);
+            }
+            else if(robot.leftStickY < -0.5){
+                robot.intakeToElevatorL.setPosition(robot.elevatorL.getPosition() - 0.005);
+            }
+            else if((robot.leftStickY >= -0.5) && (robot.leftStickY < -0.05)){
+                robot.intakeToElevatorL.setPosition(robot.elevatorL.getPosition() - 0.001);
+            }
+
+            if(robot.rightStickY > 0.5){
+                robot.intakeToElevatorR.setPosition(robot.elevatorR.getPosition() + 0.005);
+            }
+            else if((robot.rightStickY <= 0.5) && (robot.rightStickY > 0.05)){
+                robot.intakeToElevatorR.setPosition(robot.elevatorR.getPosition() + 0.001);
+            }
+            else if(robot.rightStickY < -0.5){
+                robot.intakeToElevatorR.setPosition(robot.elevatorR.getPosition() - 0.005);
+            }
+            else if((robot.rightStickY >= -0.5) && (robot.rightStickY < -0.05)){
+                robot.intakeToElevatorR.setPosition(robot.elevatorR.getPosition() - 0.001);
+            }
+
+            //launcher feeder
+            if(robot.leftStickY2 > 0.5){
+                robot.launcherFeederL.setPosition(robot.launcherFeederL.getPosition() + 0.005);
+            }
+            else if((robot.leftStickY2 <= 0.5) && (robot.leftStickY2 > 0.05)){
+                robot.launcherFeederL.setPosition(robot.launcherFeederL.getPosition() + 0.001);
+            }
+            else if(robot.leftStickY2 < -0.5){
+                robot.launcherFeederL.setPosition(robot.launcherFeederL.getPosition() - 0.005);
+            }
+            else if((robot.leftStickY2 >= -0.5) && (robot.leftStickY2 < -0.05)){
+                robot.launcherFeederL.setPosition(robot.launcherFeederL.getPosition() - 0.001);
+            }
+
+            if(robot.rightStickY2 > 0.5){
+                robot.launcherFeederR.setPosition(robot.launcherFeederR.getPosition() + 0.005);
+            }
+            else if((robot.rightStickY2 <= 0.5) && (robot.rightStickY2 > 0.05)){
+                robot.launcherFeederR.setPosition(robot.launcherFeederR.getPosition() + 0.001);
+            }
+            else if(robot.rightStickY2 < -0.5){
+                robot.launcherFeederR.setPosition(robot.launcherFeederR.getPosition() - 0.005);
+            }
+            else if((robot.rightStickY2 >= -0.5) && (robot.rightStickY2 < -0.05)){
+                robot.launcherFeederR.setPosition(robot.launcherFeederR.getPosition() - 0.001);
+            }
+
+
+
 
 
             telemetry.addData("Left trigger", robot.triggerLeft2);
             telemetry.addData("Right trigger", robot.triggerRight2);
-            telemetry.addData("Wobble Claw      ", "%.3f", robot.wobbleClaw.getPosition());
-            telemetry.addData("Wobble Goal Arm  ", "%.3f", robot.wobbleGoalArm.getPosition());
+
+            telemetry.addData("Elevator R  ", "%.3f", robot.elevatorR.getPosition());
+            telemetry.addData("Elevator L      ", "%.3f", robot.elevatorL.getPosition());
+
+            telemetry.addData("intake to elevator R   ", "%.3f", robot.intakeToElevatorR.getPosition());
+            telemetry.addData("intake to Elevator L   ", "%.3f", robot.intakeToElevatorL.getPosition());
+
+            telemetry.addData("Launcher Feeder R      ", "%.3f", robot.launcherFeederR.getPosition());
+            telemetry.addData("Launcher Feeder L      ", "%.3f", robot.launcherFeederL.getPosition());
+            
 
             telemetry.update();
             sleep(100);
