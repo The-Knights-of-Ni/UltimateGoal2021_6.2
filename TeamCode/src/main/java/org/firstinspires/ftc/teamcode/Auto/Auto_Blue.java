@@ -111,20 +111,24 @@ public class Auto_Blue extends LinearOpMode {
 
         // deploy claw and drop wobble goal
         robot.control.deployWobble();
+        sleep(500);
         robot.control.openWobbleGoalClaw();
+        sleep(500);
         robot.control.retractWobble();
+        sleep(500);
         robot.control.closeWobbleGoalClaw();
+        sleep(500);
 
         if(numRings.equals("ZERO")) {
             // align robot
         }
         else if(numRings.equals("ONE")) {
             robot.drive.moveBackward((94.25-70.75)*mmPerInch);
-            robot.drive.moveLeft(22.75/2*mmPerInch);
+            robot.drive.moveRight(22.75/2*mmPerInch);
         }
         else {
             robot.drive.moveBackward((117.75-70.75)*mmPerInch);
-            robot.drive.moveRight(22.75/2*mmPerInch);
+            robot.drive.moveLeft(22.75/2*mmPerInch);
         }
 
         robot.drive.moveBackward(22.75/2 * mmPerInch);

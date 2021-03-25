@@ -116,11 +116,11 @@ public class Auto_Red extends LinearOpMode {
         }
         else if(numRings.equals("ONE")) {
             robot.drive.moveBackward((94.25-70.75)*mmPerInch);
-            robot.drive.moveRight(22.75/2*mmPerInch);
+            robot.drive.moveLeft(22.75/2*mmPerInch);
         }
         else {
             robot.drive.moveBackward((117.75-70.75)*mmPerInch);
-            robot.drive.moveLeft(22.75/2*mmPerInch);
+            robot.drive.moveRight(22.75/2*mmPerInch);
         }
 
         robot.drive.moveBackward(22.75/2 * mmPerInch);
