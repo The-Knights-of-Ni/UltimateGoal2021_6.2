@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode.Teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Subsystems.IntakeToElevatorThread;
+import org.firstinspires.ftc.teamcode.Subsystems.LauncherFeederThread;
 import org.firstinspires.ftc.teamcode.Subsystems.Robot;
 
 import java.io.IOException;
@@ -62,11 +65,18 @@ public class TeleopMark2 extends LinearOpMode {
 
         telemetry.addData("Wait for start", "");
         telemetry.update();
+
+        robot.control.restLauncherFeeder();
+        robot.control.openIntakeToElevator();
+        robot.control.moveElevatorToBottom();
     }
 
     @Override
     public void runOpMode() throws InterruptedException {
         initOpMode();
+
+        Thread intakeToElevatorThread = new IntakeToElevatorThread(this, robot);
+        Thread launcherFeederThread = new LauncherFeederThread(this, robot);
         waitForStart();
 
 //        robot.initServosTeleop();
@@ -163,26 +173,30 @@ public class TeleopMark2 extends LinearOpMode {
                     isIntakeToElevator = false;
                 }
                 else{
-                    robot.control.closeIntakeToElevator();
-                    robot.control.openIntakeToElevator();
+//                    robot.control.closeIntakeToElevator();
+//                    robot.control.openIntakeToElevator();
+                    intakeToElevatorThread.start();
                     isIntakeToElevator = true;
                 }
 
             }
 
-            if((robot.triggerLeft > 0.3)){
+            if((robot.triggerRight > 0.3)){
                 if(isLauncherFeeder){
                     isLauncherFeeder = false;
                 }
                 else{
-                    robot.control.launchLauncherFeeder();
-                    robot.control.restLauncherFeeder();
+                    launcherFeederThread.start();
                     isLauncherFeeder = true;
                 }
             }
 
             if(robot.dPadUp && !robot.isdPadUpPressedPrev){
+                robot.control.moveElevator(1);
+            }
 
+            if(robot.dPadDown && !robot.isdPadDownPressedPrev){
+                robot.control.moveElevator(-1);
             }
 
 
@@ -192,6 +206,50 @@ public class TeleopMark2 extends LinearOpMode {
 //                    currentPositions[0], currentPositions[1], currentPositions[2], currentPositions[3]);
             telemetry.update();
         }
+        intakeToElevatorThread.interrupt();
+        intakeToElevatorThread.interrupt();
     }
+
+//    class IntakeToElevatorThread extends Thread {
+//
+//        private Robot robot;
+//        public IntakeToElevatorThread(Robot robot) {
+//            this.setName("IntakeToElevatorThread");
+//            this.robot = robot;
+//            telemetry.addData("IntakeToElevatorThread ", this.getName());
+//            telemetry.update();
+//        }
+//
+//        // called when tread.start is called. thread stays in loop to do what it does until exit is
+//        // signaled by main code calling thread.interrupt.
+//        @Override
+//        public void run() {
+//            telemetry.addData("Starting thread ", this.getName());
+//            int evenValue = 0;
+//            try {
+//
+//                robot.control.closeIntakeToElevator();
+//                sleep(100);
+//                robot.control.openIntakeToElevator();
+//
+////                while (!isInterrupted()) {
+////
+////
+////                    telemetry.addData("Running thread ",evenValue);
+////                    telemetry.update();
+////                }
+//
+//                evenValue += 2;
+//            }
+//            // interrupted means time to shutdown. note we can stop by detecting isInterrupted = true
+//            // or by the interrupted exception thrown from the sleep function.
+//            // an error occurred in the run loop.
+//            catch (Exception e) {
+////                e.printStackTrace(Logging.logPrintStream);
+//            }
+//
+////            Logging.log("end of thread %s", this.getName());
+//        }
+//    }
 
 }

@@ -101,10 +101,15 @@ public class Control extends Subsystem {
     private static final double     WB_CLAW_POS_CLOSED_STONE          = 0;
     private static final double     WB_CLAW_POS_CLOSED                = 0;
 
+    private static final double     WOBBLE_GOAL_ARM_DOWN         = 0.0;
+
+    private static final double     WOBBLE_GOAL_CLAW_OPEN        = 0.405;
+    private static final double     WOBBLE_GOAL_CLAW_OPEN_WIDE   = 0.219;
+    private static final double     WOBBLE_GOAL_CLAW_CLOSED      = 0.58;
     private static final double     INTAKE_TO_ELEVATOR_R_OPEN    = 0.54;
-    private static final double     INTAKE_TO_ELEVATOR_R_CLOSE   = 0.8;
+    private static final double     INTAKE_TO_ELEVATOR_R_CLOSE   = 0.18;
     private static final double     INTAKE_TO_ELEVATOR_L_OPEN    = 0.48;
-    private static final double     INTAKE_TO_ELEVATOR_L_CLOSE   = 0.18;
+    private static final double     INTAKE_TO_ELEVATOR_L_CLOSE   = 0.8;
     private static final double     LAUNCHER_FEEDER_R_LAUNCH     = 0.279;
     private static final double     LAUNCHER_FEEDER_R_REST       = 0.56;
     private static final double     LAUNCHER_FEEDER_L_LAUNCH     = 0.70;
@@ -339,6 +344,11 @@ public class Control extends Subsystem {
                 elevatorL.setPosition(ELEVATOR_1RING_POS_L);
                 break;
         }
+    }
+
+    public void moveElevatorToBottom(){
+        elevatorR.setPosition(ELEVATOR_BOTTOM_POS_R);
+        elevatorL.setPosition(ELEVATOR_BOTTOM_POS_L);
     }
 
 
