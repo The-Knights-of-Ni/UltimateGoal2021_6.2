@@ -2,18 +2,16 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import static java.lang.Thread.sleep;
-
-public class IntakeToElevatorThread extends Thread{
+public class WobbleGoalArmTeleopThread extends Thread{
 
     private Robot robot;
     private OpMode opMode;
 
-    public IntakeToElevatorThread(OpMode opMode, Robot robot) {
-        this.setName("IntakeToElevatorThread");
+    public WobbleGoalArmTeleopThread(OpMode opMode, Robot robot) {
+        this.setName("WobbleGoalArmTeleopThread");
         this.robot = robot;
         this.opMode = opMode;
-        opMode.telemetry.addData("IntakeToElevatorThread ", this.getName());
+        opMode.telemetry.addData("WobbleGoalArmTeleopThread ", this.getName());
         opMode.telemetry.update();
     }
 
@@ -23,9 +21,9 @@ public class IntakeToElevatorThread extends Thread{
         int evenValue = 0;
         try {
 
-            robot.control.closeIntakeToElevator();
-            sleep(475);
-            robot.control.openIntakeToElevator();
+            robot.control.launchLauncherFeeder();
+            sleep(350);
+            robot.control.restLauncherFeeder();
 
 //                while (!isInterrupted()) {
 //

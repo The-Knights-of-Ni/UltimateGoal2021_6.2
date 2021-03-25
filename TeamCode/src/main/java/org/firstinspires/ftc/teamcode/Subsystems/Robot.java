@@ -280,7 +280,7 @@ public class Robot extends Subsystem {
 
     public void initServosTeleop() {
         control.retractWobble();
-        control.closeWobbleClaw();
+        control.closeWobbleGoalClaw();
     }
 
     public OpMode getOpmode(){

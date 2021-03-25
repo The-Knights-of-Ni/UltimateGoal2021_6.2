@@ -45,6 +45,8 @@ public class TeleopMark2 extends LinearOpMode {
     private boolean isLaunchOn = false;
     private boolean isIntakeToElevator = false;
     private boolean isLauncherFeeder = false;
+    private boolean isWobbleClawOpen = false;
+    private double  wobbleGoalArmIncrement = 0.0;
 
 
 
@@ -69,6 +71,8 @@ public class TeleopMark2 extends LinearOpMode {
         robot.control.restLauncherFeeder();
         robot.control.openIntakeToElevator();
         robot.control.moveElevatorToBottom();
+        robot.wobbleGoalArm.setPosition(0.0);
+        robot.control.closeWobbleGoalClaw();
     }
 
     @Override
@@ -77,6 +81,9 @@ public class TeleopMark2 extends LinearOpMode {
 
         Thread intakeToElevatorThread = new IntakeToElevatorThread(this, robot);
         Thread launcherFeederThread = new LauncherFeederThread(this, robot);
+
+        double wobbleGoalArmNewPos = robot.wobbleGoalArm.getPosition();
+
         waitForStart();
 
 //        robot.initServosTeleop();
@@ -181,6 +188,7 @@ public class TeleopMark2 extends LinearOpMode {
 
             }
 
+            //toggle Laucher Feeder
             if((robot.triggerRight > 0.3)){
                 if(isLauncherFeeder){
                     isLauncherFeeder = false;
@@ -191,12 +199,44 @@ public class TeleopMark2 extends LinearOpMode {
                 }
             }
 
+            //Move elevator
             if(robot.dPadUp && !robot.isdPadUpPressedPrev){
                 robot.control.moveElevator(1);
             }
 
             if(robot.dPadDown && !robot.isdPadDownPressedPrev){
                 robot.control.moveElevator(-1);
+            }
+
+            //toggle wobble goal claw
+            if(robot.bumperLeft && !robot.islBumperPressedPrev){
+                if(isWobbleClawOpen){
+                    robot.control.closeWobbleGoalClaw();
+                    isWobbleClawOpen = false;
+                }
+                else{
+                    robot.control.openWobbleGoalClaw();
+                    isWobbleClawOpen = true;
+                }
+
+            }
+
+            wobbleGoalArmIncrement = 0.2;
+            //Wobble goal arm
+            if((robot.triggerLeft > 0.3) && robot.dPadRight){
+                wobbleGoalArmNewPos = robot.wobbleGoalArm.getPosition() + wobbleGoalArmIncrement;
+                if(wobbleGoalArmNewPos > 1.0){
+                    wobbleGoalArmNewPos = 1.0;
+                }
+                robot.wobbleGoalArm.setPosition(robot.wobbleGoalArm.getPosition() + wobbleGoalArmIncrement);
+            }
+
+            if((robot.triggerLeft > 0.3) && robot.dPadLeft){
+                wobbleGoalArmNewPos = robot.wobbleGoalArm.getPosition() - wobbleGoalArmIncrement;
+                if(wobbleGoalArmNewPos < 0.0){
+                    wobbleGoalArmNewPos = 0.0;
+                }
+                robot.wobbleGoalArm.setPosition(robot.wobbleGoalArm.getPosition() - wobbleGoalArmIncrement);
             }
 
 
@@ -210,46 +250,5 @@ public class TeleopMark2 extends LinearOpMode {
         intakeToElevatorThread.interrupt();
     }
 
-//    class IntakeToElevatorThread extends Thread {
-//
-//        private Robot robot;
-//        public IntakeToElevatorThread(Robot robot) {
-//            this.setName("IntakeToElevatorThread");
-//            this.robot = robot;
-//            telemetry.addData("IntakeToElevatorThread ", this.getName());
-//            telemetry.update();
-//        }
-//
-//        // called when tread.start is called. thread stays in loop to do what it does until exit is
-//        // signaled by main code calling thread.interrupt.
-//        @Override
-//        public void run() {
-//            telemetry.addData("Starting thread ", this.getName());
-//            int evenValue = 0;
-//            try {
-//
-//                robot.control.closeIntakeToElevator();
-//                sleep(100);
-//                robot.control.openIntakeToElevator();
-//
-////                while (!isInterrupted()) {
-////
-////
-////                    telemetry.addData("Running thread ",evenValue);
-////                    telemetry.update();
-////                }
-//
-//                evenValue += 2;
-//            }
-//            // interrupted means time to shutdown. note we can stop by detecting isInterrupted = true
-//            // or by the interrupted exception thrown from the sleep function.
-//            // an error occurred in the run loop.
-//            catch (Exception e) {
-////                e.printStackTrace(Logging.logPrintStream);
-//            }
-//
-////            Logging.log("end of thread %s", this.getName());
-//        }
-//    }
 
 }

@@ -123,10 +123,10 @@ public class TeleopTest extends LinearOpMode {
                 }
             }
             if ((robot.triggerLeft2 > 0.5) && (robot.triggerRight2 < 0.5)) {
-                robot.control.closeWobbleClaw();
+                robot.control.closeWobbleGoalClaw();
             }
             else if ((robot.triggerRight2 > 0.5) && (robot.triggerLeft2 < 0.5)){
-                robot.control.openWobbleClaw();
+                robot.control.openWobbleGoalClaw();
             }
             telemetry.addData("Launch 1  RPM: ", speed1);
             telemetry.addData("Launch 2a RPM: ", speed2a);

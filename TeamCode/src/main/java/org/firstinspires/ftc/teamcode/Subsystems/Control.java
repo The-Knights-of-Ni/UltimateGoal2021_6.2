@@ -218,12 +218,13 @@ public class Control extends Subsystem {
         return MOTOR_TICK_PER_REV_YELLOJACKET223;
     }
 
-    public void openWobbleClaw() {
-        wobbleClaw.setPosition(0.7);
+    public void openWobbleGoalClaw() {
+        wobbleClaw.setPosition(WOBBLE_GOAL_CLAW_OPEN);
     }
-    public void closeWobbleClaw(){
-        wobbleClaw.setPosition(1);
+    public void closeWobbleGoalClaw(){
+        wobbleClaw.setPosition(WOBBLE_GOAL_CLAW_CLOSED);
     }
+    public void openWideWobbleGoalClaw(){wobbleClaw.setPosition(WOBBLE_GOAL_CLAW_OPEN_WIDE);};
 
     public void deployWobble() {
         wobbleGoalArm.setPosition(0.934);
