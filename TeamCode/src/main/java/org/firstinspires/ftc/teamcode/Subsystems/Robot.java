@@ -266,7 +266,7 @@ public class Robot extends Subsystem {
 
         opMode.telemetry.addData("Mode", " vision initializing...");
         opMode.telemetry.update();
-//        vision = new Vision(hardwareMap, this, isBlue);
+        vision = new Vision(hardwareMap, this, isBlue);
 
     }
 

@@ -111,6 +111,8 @@ public class Auto_Red extends LinearOpMode {
         robot.control.retractWobble();
         robot.control.closeWobbleGoalClaw();
 
+        sleep(6000);
+
         if(numRings.equals("ZERO")) {
             // align robot
         }

@@ -111,13 +111,11 @@ public class Auto_Blue extends LinearOpMode {
 
         // deploy claw and drop wobble goal
         robot.control.deployWobble();
-        sleep(500);
         robot.control.openWobbleGoalClaw();
-        sleep(500);
         robot.control.retractWobble();
-        sleep(500);
         robot.control.closeWobbleGoalClaw();
-        sleep(500);
+
+        sleep(6000);
 
         if(numRings.equals("ZERO")) {
             // align robot
