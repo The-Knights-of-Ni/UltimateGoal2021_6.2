@@ -175,8 +175,8 @@ public class TeleopMark2 extends LinearOpMode {
                     isLauncherFeeder = false;
                 }
                 else{
-                    robot.control.openLauncherFeeder();
-                    robot.control.closeLauncherFeeder();
+                    robot.control.launchLauncherFeeder();
+                    robot.control.restLauncherFeeder();
                     isLauncherFeeder = true;
                 }
             }

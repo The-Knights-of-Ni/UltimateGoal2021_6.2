@@ -101,14 +101,14 @@ public class Control extends Subsystem {
     private static final double     WB_CLAW_POS_CLOSED_STONE          = 0;
     private static final double     WB_CLAW_POS_CLOSED                = 0;
 
-    private static final double     INTAKE_TO_ELEVATOR_R_OPEN    = 0.0;
-    private static final double     INTAKE_TO_ELEVATOR_R_CLOSE   = 0.0;
-    private static final double     INTAKE_TO_ELEVATOR_L_OPEN    = 0.0;
-    private static final double     INTAKE_TO_ELEVATOR_L_CLOSE   = 0.0;
-    private static final double     LAUNCHER_FEEDER_R_OPEN       = 0.0;
-    private static final double     LAUNCHER_FEEDER_R_CLOSE      = 0.0;
-    private static final double     LAUNCHER_FEEDER_L_OPEN       = 0.0;
-    private static final double     LAUNCHER_FEEDER_L_CLOSE      = 0.0;
+    private static final double     INTAKE_TO_ELEVATOR_R_OPEN    = 0.54;
+    private static final double     INTAKE_TO_ELEVATOR_R_CLOSE   = 0.8;
+    private static final double     INTAKE_TO_ELEVATOR_L_OPEN    = 0.48;
+    private static final double     INTAKE_TO_ELEVATOR_L_CLOSE   = 0.18;
+    private static final double     LAUNCHER_FEEDER_R_LAUNCH     = 0.0;
+    private static final double     LAUNCHER_FEEDER_R_REST       = 0.56;
+    private static final double     LAUNCHER_FEEDER_L_LAUNCH     = 0.0;
+    private static final double     LAUNCHER_FEEDER_L_REST       = 0.39;
     private static final double     ELEVATOR_BOTTOM_POS_R         = 0.0;
     private static final double     ELEVATOR_BOTTOM_POS_L         = 0.0;
     private static final double     ELEVATOR_1RING_POS_R          = 0.0;
@@ -261,14 +261,14 @@ public class Control extends Subsystem {
         intakeToElevatorL.setPosition(INTAKE_TO_ELEVATOR_L_OPEN);
     }
 
-    public void openLauncherFeeder(){
-        launcherFeederR.setPosition(LAUNCHER_FEEDER_R_OPEN);
-        launcherFeederL.setPosition(LAUNCHER_FEEDER_L_OPEN);
+    public void restLauncherFeeder(){
+        launcherFeederR.setPosition(LAUNCHER_FEEDER_R_REST);
+        launcherFeederL.setPosition(LAUNCHER_FEEDER_L_REST);
     }
 
-    public void closeLauncherFeeder(){
-        launcherFeederR.setPosition(LAUNCHER_FEEDER_R_CLOSE);
-        launcherFeederL.setPosition(LAUNCHER_FEEDER_L_CLOSE);
+    public void launchLauncherFeeder(){
+        launcherFeederR.setPosition(LAUNCHER_FEEDER_R_LAUNCH);
+        launcherFeederL.setPosition(LAUNCHER_FEEDER_L_LAUNCH);
     }
 
     public void setIntake(boolean status){
