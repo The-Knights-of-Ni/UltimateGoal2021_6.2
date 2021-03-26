@@ -8,6 +8,7 @@ public class IntakeToElevatorThread extends Thread{
 
     private Robot robot;
     private OpMode opMode;
+    private boolean isIntakeToElevator = false;
 
     public IntakeToElevatorThread(OpMode opMode, Robot robot) {
         this.setName("IntakeToElevatorThread");
@@ -23,16 +24,18 @@ public class IntakeToElevatorThread extends Thread{
         int evenValue = 0;
         try {
 
-            robot.control.closeIntakeToElevator();
-            sleep(475);
-            robot.control.openIntakeToElevator();
-
-//                while (!isInterrupted()) {
-//
-//
-//                    telemetry.addData("Running thread ",evenValue);
-//                    telemetry.update();
-//                }
+            while (!isInterrupted()) {
+                if (robot.bumperRight && !robot.isrBumperPressedPrev) {
+                    if (isIntakeToElevator) {
+                        isIntakeToElevator = false;
+                    } else {
+                        robot.control.closeIntakeToElevator();
+                        sleep(600);
+                        robot.control.openIntakeToElevator();
+                        isIntakeToElevator = true;
+                    }
+                }
+            }
 
             evenValue += 2;
         }

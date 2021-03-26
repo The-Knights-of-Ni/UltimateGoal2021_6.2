@@ -2,15 +2,17 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
+import org.firstinspires.ftc.teamcode.Teleop.TeleopMark2;
+
 public class LauncherFeederThread extends Thread{
 
     private Robot robot;
     private OpMode opMode;
+    private boolean isLauncherFeeder = false;
 
     public LauncherFeederThread(OpMode opMode, Robot robot) {
         this.setName("LauncherFeederThread");
         this.robot = robot;
-        this.opMode = opMode;
         opMode.telemetry.addData("LauncherFeederThread ", this.getName());
         opMode.telemetry.update();
     }
@@ -21,16 +23,20 @@ public class LauncherFeederThread extends Thread{
         int evenValue = 0;
         try {
 
-            robot.control.launchLauncherFeeder();
-            sleep(350);
-            robot.control.restLauncherFeeder();
+            while (!isInterrupted()) {
+                if((robot.triggerRight > 0.3)){
+                    if(isLauncherFeeder){
+                        isLauncherFeeder = false;
+                    }
+                    else{
+                        robot.control.launchLauncherFeeder();
+                        sleep(350);
+                        robot.control.restLauncherFeeder();
+                        isLauncherFeeder = true;
+                    }
+                }
 
-//                while (!isInterrupted()) {
-//
-//
-//                    telemetry.addData("Running thread ",evenValue);
-//                    telemetry.update();
-//                }
+            }
 
             evenValue += 2;
         }

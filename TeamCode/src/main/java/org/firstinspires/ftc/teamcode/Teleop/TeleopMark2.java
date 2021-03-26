@@ -3,11 +3,13 @@ package org.firstinspires.ftc.teamcode.Teleop;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Subsystems.IntakeToElevatorThread;
 import org.firstinspires.ftc.teamcode.Subsystems.LauncherFeederThread;
 import org.firstinspires.ftc.teamcode.Subsystems.Robot;
+import org.firstinspires.ftc.teamcode.Subsystems.WobbleGoalArmTeleopThread;
 
 import java.io.IOException;
 
@@ -23,6 +25,8 @@ public class TeleopMark2 extends LinearOpMode {
     double deltaT;
     double timeCurrent;
     double timePre;
+
+    double leftStickY;
     ElapsedTime timer;
 
     enum Prospective {
@@ -81,10 +85,14 @@ public class TeleopMark2 extends LinearOpMode {
 
         Thread intakeToElevatorThread = new IntakeToElevatorThread(this, robot);
         Thread launcherFeederThread = new LauncherFeederThread(this, robot);
+        Thread wobbleGoalArmThread = new WobbleGoalArmTeleopThread(this, robot);
 
-        double wobbleGoalArmNewPos = robot.wobbleGoalArm.getPosition();
 
         waitForStart();
+        wobbleGoalArmThread.start();
+        launcherFeederThread.start();
+        intakeToElevatorThread.start();
+
 
 //        robot.initServosTeleop();
 
@@ -93,7 +101,6 @@ public class TeleopMark2 extends LinearOpMode {
         timePre = timeCurrent;
 
         while(opModeIsActive()) {
-
             // Get gamepad inputs
             robot.getGamePadInputs();
 
@@ -108,35 +115,6 @@ public class TeleopMark2 extends LinearOpMode {
 
             motorPowers = robot.drive.calcMotorPowers(robot.leftStickX, robot.leftStickY, robot.rightStickX);
             robot.drive.setDrivePowers(motorPowers);
-
-
-
-//            //Open and close claw
-//            if (wobbleClawControlDigital) {
-//                if (robot.bumperRight2 && !robot.isrBumper2PressedPrev) { // toggle main claw arm deploy mode
-//                    robot.control.openWobbleClaw();
-//                        robot.isrBumper2PressedPrev = true;
-//                    wobbleClawOpen = true;
-//                }
-//                else
-//                    robot.isrBumper2PressedPrev = false;
-//            }
-//            if ((robot.triggerRight2 > 0.5) && (robot.triggerLeft2 < 0.5)){
-//                robot.control.closeWobbleClaw();
-//                wobbleClawOpen = false;
-//            }
-//
-//            //Retract and deploy arm
-//            if (wobbleClawControlDigital) {
-//                if (robot.bumperLeft2 && !robot.islBumper2PressedPrev) { // toggle main claw arm deploy mode
-//                    robot.control.deployWobble();
-//                    wobbleClawDeployed = true;
-//                }
-//            }
-//            if ((robot.triggerLeft2 > 0.5) && (robot.triggerRight2 < 0.5)){
-//                robot.control.retractWobble();
-//                wobbleClawDeployed = false;
-//            }
 
             //Toggle intake regular
             if (robot.aButton && !robot.isaButtonPressedPrev){
@@ -174,30 +152,6 @@ public class TeleopMark2 extends LinearOpMode {
                 }
             }
 
-            //Intake to elevator
-            if (robot.bumperRight && !robot.isrBumperPressedPrev){
-                if(isIntakeToElevator){
-                    isIntakeToElevator = false;
-                }
-                else{
-//                    robot.control.closeIntakeToElevator();
-//                    robot.control.openIntakeToElevator();
-                    intakeToElevatorThread.start();
-                    isIntakeToElevator = true;
-                }
-
-            }
-
-            //toggle Laucher Feeder
-            if((robot.triggerRight > 0.3)){
-                if(isLauncherFeeder){
-                    isLauncherFeeder = false;
-                }
-                else{
-                    launcherFeederThread.start();
-                    isLauncherFeeder = true;
-                }
-            }
 
             //Move elevator
             if(robot.dPadUp && !robot.isdPadUpPressedPrev){
@@ -221,24 +175,6 @@ public class TeleopMark2 extends LinearOpMode {
 
             }
 
-            wobbleGoalArmIncrement = 0.2;
-            //Wobble goal arm
-            if((robot.triggerLeft > 0.3) && robot.dPadRight){
-                wobbleGoalArmNewPos = robot.wobbleGoalArm.getPosition() + wobbleGoalArmIncrement;
-                if(wobbleGoalArmNewPos > 1.0){
-                    wobbleGoalArmNewPos = 1.0;
-                }
-                robot.wobbleGoalArm.setPosition(robot.wobbleGoalArm.getPosition() + wobbleGoalArmIncrement);
-            }
-
-            if((robot.triggerLeft > 0.3) && robot.dPadLeft){
-                wobbleGoalArmNewPos = robot.wobbleGoalArm.getPosition() - wobbleGoalArmIncrement;
-                if(wobbleGoalArmNewPos < 0.0){
-                    wobbleGoalArmNewPos = 0.0;
-                }
-                robot.wobbleGoalArm.setPosition(robot.wobbleGoalArm.getPosition() - wobbleGoalArmIncrement);
-            }
-
 
 
 //            int currentPositions[] = robot.drive.getCurrentPositions();
@@ -247,8 +183,11 @@ public class TeleopMark2 extends LinearOpMode {
             telemetry.update();
         }
         intakeToElevatorThread.interrupt();
-        intakeToElevatorThread.interrupt();
+        launcherFeederThread.interrupt();
+        wobbleGoalArmThread.interrupt();
     }
+
+
 
 
 }

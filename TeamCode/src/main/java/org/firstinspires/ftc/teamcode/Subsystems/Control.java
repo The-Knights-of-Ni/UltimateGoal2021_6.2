@@ -114,8 +114,8 @@ public class Control extends Subsystem {
     private static final double     LAUNCHER_FEEDER_R_REST       = 0.56;
     private static final double     LAUNCHER_FEEDER_L_LAUNCH     = 0.70;
     private static final double     LAUNCHER_FEEDER_L_REST       = 0.39;
-    private static final double     ELEVATOR_BOTTOM_POS_R         = 0.8;
-    private static final double     ELEVATOR_BOTTOM_POS_L         = 0.179;
+    private static final double     ELEVATOR_BOTTOM_POS_R         = 0.820;
+    private static final double     ELEVATOR_BOTTOM_POS_L         = 0.170;
     private static final double     ELEVATOR_1RING_POS_R          = 0.089;
     private static final double     ELEVATOR_1RING_POS_L          = 0.90;
     private static final double     ELEVATOR_2RING_POS_R          = 0.2;
