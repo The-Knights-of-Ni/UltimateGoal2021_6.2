@@ -32,6 +32,8 @@ public class LauncherFeederThread extends Thread{
                         robot.control.launchLauncherFeeder();
                         sleep(350);
                         robot.control.restLauncherFeeder();
+                        sleep(355);
+                        robot.control.moveElevator(1);
                         isLauncherFeeder = true;
                     }
                 }

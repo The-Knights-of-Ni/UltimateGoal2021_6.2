@@ -106,22 +106,28 @@ public class Control extends Subsystem {
     private static final double     WOBBLE_GOAL_CLAW_OPEN        = 0.405;
     private static final double     WOBBLE_GOAL_CLAW_OPEN_WIDE   = 0.219;
     private static final double     WOBBLE_GOAL_CLAW_CLOSED      = 0.58;
+
     private static final double     INTAKE_TO_ELEVATOR_R_OPEN    = 0.54;
     private static final double     INTAKE_TO_ELEVATOR_R_CLOSE   = 0.18;
     private static final double     INTAKE_TO_ELEVATOR_L_OPEN    = 0.48;
     private static final double     INTAKE_TO_ELEVATOR_L_CLOSE   = 0.8;
+
     private static final double     LAUNCHER_FEEDER_R_LAUNCH     = 0.279;
     private static final double     LAUNCHER_FEEDER_R_REST       = 0.56;
     private static final double     LAUNCHER_FEEDER_L_LAUNCH     = 0.70;
     private static final double     LAUNCHER_FEEDER_L_REST       = 0.39;
+
     private static final double     ELEVATOR_BOTTOM_POS_R         = 0.820;
     private static final double     ELEVATOR_BOTTOM_POS_L         = 0.170;
-    private static final double     ELEVATOR_1RING_POS_R          = 0.089;
-    private static final double     ELEVATOR_1RING_POS_L          = 0.90;
-    private static final double     ELEVATOR_2RING_POS_R          = 0.2;
-    private static final double     ELEVATOR_2RING_POS_L          = 0.759;
-    private static final double     ELEVATOR_3RING_POS_R          = 0.33;
-    private static final double     ELEVATOR_3RING_POS_L          = 0.649;
+
+    private static final double     ELEVATOR_1RING_POS_R          = 0.192;
+    private static final double     ELEVATOR_1RING_POS_L          = 0.808;
+
+    private static final double     ELEVATOR_2RING_POS_R          = 0.30;
+    private static final double     ELEVATOR_2RING_POS_L          = 0.70;
+
+    private static final double     ELEVATOR_3RING_POS_R          = 0.424;
+    private static final double     ELEVATOR_3RING_POS_L          = 0.574 ;
 
     private static final double     LAUNCHER_ANG_PER_SEC_LIMIT = 722.0*2.0;
 

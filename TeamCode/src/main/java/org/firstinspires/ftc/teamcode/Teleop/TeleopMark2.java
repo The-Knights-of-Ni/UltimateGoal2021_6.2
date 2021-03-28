@@ -127,6 +127,7 @@ public class TeleopMark2 extends LinearOpMode {
                     isIntakeOn = false;
                 }
                 else{
+                    robot.control.moveElevatorToBottom();
                     robot.control.setIntake(true);
                     isIntakeOn = true;
                 }
@@ -159,7 +160,7 @@ public class TeleopMark2 extends LinearOpMode {
 
 
             //Move elevator
-            if(robot.dPadUp && !robot.isdPadUpPressedPrev){
+            if(robot.dPadUp && !robot.isdPadUpPressedPrev && (robot.control.getElevatorStage() != 0)){
                 robot.control.moveElevator(1);
             }
 
@@ -181,7 +182,7 @@ public class TeleopMark2 extends LinearOpMode {
             }
 
             //adjust launch velocity
-            if(robot.dPadRight && !robot.isdPadRightPressedPrev){
+            if(robot.dPadRight && !robot.isdPadRightPressedPrev && isLaunchOn){
                 newLaunchVelocity = launchVelocity + incrementVelocity;
                 if(newLaunchVelocity > robot.control.getLauncherAngPerSecLimit()){
                     newLaunchVelocity = robot.control.getLauncherAngPerSecLimit();
@@ -190,7 +191,7 @@ public class TeleopMark2 extends LinearOpMode {
                 launchVelocity = newLaunchVelocity;
 
             }
-            if(robot.dPadLeft && !robot.isdPadLeftPressedPrev){
+            if(robot.dPadLeft && !robot.isdPadLeftPressedPrev && isLaunchOn){
                 newLaunchVelocity = launchVelocity - incrementVelocity;
                 if(newLaunchVelocity < 0.0){
                     newLaunchVelocity = 0.0;
