@@ -37,8 +37,10 @@ public class MotorTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException{
 
-        double increment = 0.1;
+        double incrementPower = 0.1;
         double power = 1.0;
+        double incrementVelocity = 0.1;
+        double velocity;
 
         try {
             initOpMode();
@@ -58,15 +60,15 @@ public class MotorTest extends LinearOpMode {
             robot.getGamePadInputs();
 
             if(robot.bButton && !robot.isbButtonPressedPrev){
-                power = power + increment;
+                power = power + incrementPower;
                 if(power > 1.0){
                     power = 1.0;
                 }
                 robot.control.setLaunchPower(power);
 
             }
-            if(robot.bButton && !robot.isbButtonPressedPrev){
-                power = power - increment;
+            if(robot.aButton && !robot.isaButtonPressedPrev){
+                power = power - incrementPower;
                 if(power < 0.0){
                     power = 0.0;
                 }
