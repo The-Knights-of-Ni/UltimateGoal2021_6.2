@@ -2,15 +2,13 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import static java.lang.Thread.sleep;
-
-public class IntakeToElevatorThread extends Thread{
+public class ToggleIntakeThread extends Thread{
 
     private Robot robot;
     private OpMode opMode;
     private boolean isIntakeToElevator = false;
 
-    public IntakeToElevatorThread(OpMode opMode, Robot robot) {
+    public ToggleIntakeThread(OpMode opMode, Robot robot) {
         this.setName("IntakeToElevatorThread");
         this.robot = robot;
         this.opMode = opMode;

@@ -110,34 +110,34 @@ public class ServoTest extends LinearOpMode {
                 robot.intakeToElevatorR.setPosition(robot.intakeToElevatorR.getPosition() - absIncrementStep);
             }
 
-//            //wobble Goal claw and arm
-//            if(robot.leftStickY > 0.5){
-//                robot.wobbleGoalArm.setPosition(robot.wobbleGoalArm.getPosition() + absIncrementStep);
-//            }
-//            else if(robot.leftStickY < -0.5){
-//                robot.wobbleGoalArm.setPosition(robot.wobbleGoalArm.getPosition() - absIncrementStep);
-//            }
-//            if(robot.rightStickY > 0.5){
-//                robot.wobbleClaw.setPosition(robot.wobbleClaw.getPosition() + absIncrementStep);
-//            }
-//            else if(robot.rightStickY < -0.5){
-//                robot.wobbleClaw.setPosition(robot.wobbleClaw.getPosition() - absIncrementStep);
-//            }
-
-            //launcher feeder
-            if(robot.leftStickY2 > 0.5){
-                robot.launcherFeederL.setPosition(robot.launcherFeederL.getPosition() + absIncrementStep);
+            //wobble Goal claw and arm
+            if(robot.leftStickY > 0.5){
+                robot.wobbleGoalArm.setPosition(robot.wobbleGoalArm.getPosition() + absIncrementStep);
             }
-            else if(robot.leftStickY2 < -0.5){
-                robot.launcherFeederL.setPosition(robot.launcherFeederL.getPosition() - absIncrementStep);
+            else if(robot.leftStickY < -0.5){
+                robot.wobbleGoalArm.setPosition(robot.wobbleGoalArm.getPosition() - absIncrementStep);
+            }
+            if(robot.rightStickY > 0.5){
+                robot.wobbleClaw.setPosition(robot.wobbleClaw.getPosition() + absIncrementStep);
+            }
+            else if(robot.rightStickY < -0.5){
+                robot.wobbleClaw.setPosition(robot.wobbleClaw.getPosition() - absIncrementStep);
             }
 
-            if(robot.rightStickY2 > 0.5){
-                robot.launcherFeederR.setPosition(robot.launcherFeederR.getPosition() + absIncrementStep);
-            }
-            else if(robot.rightStickY2 < -0.5){
-                robot.launcherFeederR.setPosition(robot.launcherFeederR.getPosition() - absIncrementStep);
-            }
+//            //launcher feeder
+//            if(robot.leftStickY2 > 0.5){
+//                robot.launcherFeederL.setPosition(robot.launcherFeederL.getPosition() + absIncrementStep);
+//            }
+//            else if(robot.leftStickY2 < -0.5){
+//                robot.launcherFeederL.setPosition(robot.launcherFeederL.getPosition() - absIncrementStep);
+//            }
+//
+//            if(robot.rightStickY2 > 0.5){
+//                robot.launcherFeederR.setPosition(robot.launcherFeederR.getPosition() + absIncrementStep);
+//            }
+//            else if(robot.rightStickY2 < -0.5){
+//                robot.launcherFeederR.setPosition(robot.launcherFeederR.getPosition() - absIncrementStep);
+//            }d
 
 
 
