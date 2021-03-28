@@ -102,6 +102,10 @@ public class Control extends Subsystem {
     private static final double     WB_CLAW_POS_CLOSED                = 0;
 
     private static final double     WOBBLE_GOAL_ARM_DOWN         = 0.0;
+    private static final double     WOBBLE_GOAL_ARM_LOW          = 0.249;
+    private static final double     WOBBLE_GOAL_ARM_MED          = 0.378;
+
+
 
     private static final double     WOBBLE_GOAL_CLAW_OPEN        = 0.63;
     private static final double     WOBBLE_GOAL_CLAW_OPEN_WIDE   = 0.9;
@@ -198,6 +202,13 @@ public class Control extends Subsystem {
         // initialize main arm parameters
         mainClawArmTrackingMode = false;
     }
+    public void initServo(){
+        openIntakeToElevator();
+        restLauncherFeeder();
+        moveElevatorToBottom();
+        moveWobbleGoalArmDown();
+        openWideWobbleGoalClaw();
+    }
 
     /**
      * Sets all drive motors to specified zero power behavior
@@ -237,9 +248,6 @@ public class Control extends Subsystem {
         wobbleGoalArm.setPosition(0.934);
     }
 
-    public void retractWobble() {
-        wobbleGoalArm.setPosition(0.1);
-    }
 //    public double getWobbleArmTargetAngle() {
 //        return mainArmTargetAngle;
 //    }
@@ -377,6 +385,18 @@ public class Control extends Subsystem {
     public double autoRotateTurret() {
         double angle = 0;
         return angle;
+    }
+
+    public void moveWobbleGoalArmDown(){
+        wobbleGoalArm.setPosition(WOBBLE_GOAL_ARM_DOWN);
+    }
+
+    public void raiseWobbleGoalArmLow(){
+        wobbleGoalArm.setPosition(WOBBLE_GOAL_ARM_LOW);
+    }
+
+    public void raiseWobbleGoalArmMed(){
+        wobbleGoalArm.setPosition(WOBBLE_GOAL_ARM_MED);
     }
 
     public double tickPerSecTORPM(double angPerSec){

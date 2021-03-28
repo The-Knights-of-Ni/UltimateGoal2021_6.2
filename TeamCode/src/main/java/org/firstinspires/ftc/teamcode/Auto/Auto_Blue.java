@@ -67,6 +67,8 @@ public class Auto_Blue extends LinearOpMode {
 
         telemetry.addData("Wait for start", "");
         telemetry.update();
+
+        robot.control.initServo();
     }
 
     @Override
@@ -100,9 +102,9 @@ public class Auto_Blue extends LinearOpMode {
 
         // deploy claw and grab wobble goal
 //        robot.control.openWobbleGoalClaw();   // claws are already open at startup
-        robot.control.raiseWobbleLow();
+        robot.control.raiseWobbleGoalArmLow();
         robot.control.closeWobbleGoalClaw();
-        robot.control.raiseWobbleMedium();
+        robot.control.raiseWobbleGoalArmMed();
 
         // move to launch line
         launchPos = 56.0;
@@ -125,9 +127,9 @@ public class Auto_Blue extends LinearOpMode {
         }
 
         // deploy claw and drop wobble goal
-        robot.control.raiseWobbleLow();
-        robot.control.openWobbleGoalClaw();
-        robot.control.retractWobble();
+        robot.control.raiseWobbleGoalArmLow();
+        robot.control.openWideWobbleGoalClaw();
+        robot.control.moveWobbleGoalArmDown();
 
         sleep(6000);
 
@@ -150,21 +152,39 @@ public class Auto_Blue extends LinearOpMode {
     }
 
     private void launchRings() {
+
         // start launcher
+        robot.control.setLaunchVelocity(722.0);
 
         // wait for launch motor to stablize
+        sleep(4000);
 
         // scoop rings to the back
+        robot.control.closeIntakeToElevator();
+        sleep(600);
+        robot.control.openIntakeToElevator();
+        sleep(300);
 
         // raise elevator
+        robot.control.moveElevator(1);
 
         // launch first ring
+        robot.control.launchLauncherFeeder();
+        sleep(350);
+        robot.control.restLauncherFeeder();
+        sleep(355);
 
         // raise elevator
+        robot.control.moveElevator(1);
 
         // launch second ring
+        robot.control.launchLauncherFeeder();
+        sleep(350);
+        robot.control.restLauncherFeeder();
+        sleep(355);
 
         // lower elevator to floor
+        robot.control.moveElevatorToBottom();
 
     }
 }
