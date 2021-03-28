@@ -191,6 +191,7 @@ public class Vision {
         });
     }
 
+
     public UGContourRingPipeline.Height ringDetect() {
         return pipeline.getHeight();
     }
