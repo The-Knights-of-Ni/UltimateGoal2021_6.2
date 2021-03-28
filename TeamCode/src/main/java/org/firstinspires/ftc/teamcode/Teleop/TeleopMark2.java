@@ -152,6 +152,7 @@ public class TeleopMark2 extends LinearOpMode {
                 }
                 else{
                     robot.control.setLaunch(true);
+                    robot.control.setLaunchVelocity(-launchVelocity);
                     isLaunchOn = true;
                 }
             }
@@ -205,6 +206,10 @@ public class TeleopMark2 extends LinearOpMode {
 //            int currentPositions[] = robot.drive.getCurrentPositions();
 //            telemetry.addData("position", "fl %d, fr %d, rl %d, rr %d",
 //                    currentPositions[0], currentPositions[1], currentPositions[2], currentPositions[3]);
+            telemetry.addData("set  V: ", robot.control.tickPerSecTORPM(launchVelocity));
+            telemetry.addData("L1   V: ", robot.control.tickPerSecTORPM(robot.launch1.getVelocity()));
+            telemetry.addData("L2a  V: ", robot.control.tickPerSecTORPM(robot.launch2a.getVelocity()));
+            telemetry.addData("L2b  V: ", robot.control.tickPerSecTORPM(robot.launch2b.getVelocity()));
             telemetry.update();
         }
         intakeToElevatorThread.interrupt();
