@@ -103,9 +103,9 @@ public class Control extends Subsystem {
 
     private static final double     WOBBLE_GOAL_ARM_DOWN         = 0.0;
 
-    private static final double     WOBBLE_GOAL_CLAW_OPEN        = 0.405;
-    private static final double     WOBBLE_GOAL_CLAW_OPEN_WIDE   = 0.219;
-    private static final double     WOBBLE_GOAL_CLAW_CLOSED      = 0.58;
+    private static final double     WOBBLE_GOAL_CLAW_OPEN        = 0.63;
+    private static final double     WOBBLE_GOAL_CLAW_OPEN_WIDE   = 0.9;
+    private static final double     WOBBLE_GOAL_CLAW_CLOSED      = 0.39;
 
     private static final double     INTAKE_TO_ELEVATOR_R_OPEN    = 0.54;
     private static final double     INTAKE_TO_ELEVATOR_R_CLOSE   = 0.18;
