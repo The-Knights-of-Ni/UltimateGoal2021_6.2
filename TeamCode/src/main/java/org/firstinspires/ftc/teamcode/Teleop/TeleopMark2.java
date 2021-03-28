@@ -182,23 +182,21 @@ public class TeleopMark2 extends LinearOpMode {
 
             //adjust launch velocity
             if(robot.dPadRight && !robot.isdPadRightPressedPrev){
-                if(robot.bButton && !robot.isbButtonPressedPrev){
-                    newLaunchVelocity = launchVelocity + incrementVelocity;
-                    if(newLaunchVelocity > robot.control.getLauncherAngPerSecLimit()){
-                        newLaunchVelocity = robot.control.getLauncherAngPerSecLimit();
-                    }
-                    robot.control.setLaunchVelocity(-newLaunchVelocity);
-                    launchVelocity = newLaunchVelocity;
+                newLaunchVelocity = launchVelocity + incrementVelocity;
+                if(newLaunchVelocity > robot.control.getLauncherAngPerSecLimit()){
+                    newLaunchVelocity = robot.control.getLauncherAngPerSecLimit();
+                }
+                robot.control.setLaunchVelocity(-newLaunchVelocity);
+                launchVelocity = newLaunchVelocity;
 
+            }
+            if(robot.dPadLeft && !robot.isdPadLeftPressedPrev){
+                newLaunchVelocity = launchVelocity - incrementVelocity;
+                if(newLaunchVelocity < 0.0){
+                    newLaunchVelocity = 0.0;
                 }
-                if(robot.aButton && !robot.isaButtonPressedPrev){
-                    newLaunchVelocity = launchVelocity - incrementVelocity;
-                    if(newLaunchVelocity < 0.0){
-                        newLaunchVelocity = 0.0;
-                    }
-                    robot.control.setLaunchVelocity(-newLaunchVelocity);
-                    launchVelocity = newLaunchVelocity;
-                }
+                robot.control.setLaunchVelocity(-newLaunchVelocity);
+                launchVelocity = newLaunchVelocity;
             }
 
 
