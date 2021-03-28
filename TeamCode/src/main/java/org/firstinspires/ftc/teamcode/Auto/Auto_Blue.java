@@ -56,6 +56,8 @@ public class Auto_Blue extends LinearOpMode {
 
     private boolean targetVisible = false;
 
+    private double launchPos;
+
     private void initOpMode() throws IOException {
         telemetry.addData("Init Robot", "");
         telemetry.update();
@@ -96,52 +98,73 @@ public class Auto_Blue extends LinearOpMode {
                 break;
         }
 
-        if(numRings.equals("ZERO")) {
-            robot.drive.moveForward(70.75*mmPerInch);
-            robot.drive.moveRight(22.75/2*mmPerInch);
-        }
-        else if(numRings.equals("ONE")) {
-            robot.drive.moveForward(94.25*mmPerInch);
-            robot.drive.moveLeft(22.75/2*mmPerInch);
-        }
-        else {
-            robot.drive.moveForward(117.75*mmPerInch);
-            robot.drive.moveRight(22.75/2*mmPerInch);
-        }
-
-        // deploy claw and drop wobble goal
-        robot.control.deployWobble();
-        robot.control.openWobbleGoalClaw();
-        robot.control.retractWobble();
+        // deploy claw and grab wobble goal
+//        robot.control.openWobbleGoalClaw();   // claws are already open at startup
+        robot.control.raiseWobbleLow();
         robot.control.closeWobbleGoalClaw();
+        robot.control.raiseWobbleMedium();
 
-        sleep(6000);
-
-        if(numRings.equals("ZERO")) {
-            // align robot
-        }
-        else if(numRings.equals("ONE")) {
-            robot.drive.moveBackward((94.25-70.75)*mmPerInch);
-            robot.drive.moveRight(22.75/2*mmPerInch);
-        }
-        else {
-            robot.drive.moveBackward((117.75-70.75)*mmPerInch);
-            robot.drive.moveLeft(22.75/2*mmPerInch);
-        }
-
-        robot.drive.moveBackward(22.75/2 * mmPerInch);
+        // move to launch line
+        launchPos = 56.0;
+        robot.drive.moveForward(launchPos*mmPerInch);
 
         // launch rings
         launchRings();
 
+        if(numRings.equals("ZERO")) {
+            robot.drive.moveForward((70.75-launchPos)*mmPerInch);
+//            robot.drive.moveRight(22.75/2*mmPerInch);
+        }
+        else if(numRings.equals("ONE")) {
+            robot.drive.moveForward((94.25-launchPos)*mmPerInch);
+            robot.drive.moveRight(22.75*mmPerInch);
+        }
+        else {
+            robot.drive.moveForward((117.75-launchPos)*mmPerInch);
+//            robot.drive.moveRight(22.75/2*mmPerInch);
+        }
+
+        // deploy claw and drop wobble goal
+        robot.control.raiseWobbleLow();
+        robot.control.openWobbleGoalClaw();
+        robot.control.retractWobble();
+
+        sleep(6000);
+
         // park robot
+        if(numRings.equals("ZERO")) {
+            // align robot
+            robot.drive.moveForward(3.0*mmPerInch);
+        }
+        else if(numRings.equals("ONE")) {
+            robot.drive.moveBackward((94.25-70.75-3.0)*mmPerInch);
+//            robot.drive.moveRight(22.75/2*mmPerInch);
+        }
+        else {
+            robot.drive.moveBackward((117.75-70.75-3.0)*mmPerInch);
+//            robot.drive.moveLeft(22.75/2*mmPerInch);
+        }
+
+//        robot.drive.moveBackward(22.75/2 * mmPerInch);
+
     }
 
     private void launchRings() {
-        // align robot
-        // detect high goal with vision
-        // launch rings to high goal
+        // start launcher
 
-        // this should prob be in control tbh, but we can figure that out once launcher is operational
+        // wait for launch motor to stablize
+
+        // scoop rings to the back
+
+        // raise elevator
+
+        // launch first ring
+
+        // raise elevator
+
+        // launch second ring
+
+        // lower elevator to floor
+
     }
 }
