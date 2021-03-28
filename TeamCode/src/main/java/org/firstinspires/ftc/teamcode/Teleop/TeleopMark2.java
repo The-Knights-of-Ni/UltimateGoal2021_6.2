@@ -52,6 +52,10 @@ public class TeleopMark2 extends LinearOpMode {
     private boolean isWobbleClawOpen = false;
     private double  wobbleGoalArmIncrement = 0.0;
 
+    private double launchVelocity = 722.0;
+    private double newLaunchVelocity = launchVelocity;
+    private double incrementVelocity = 20.0;
+
 
 
 
@@ -173,6 +177,27 @@ public class TeleopMark2 extends LinearOpMode {
                     isWobbleClawOpen = true;
                 }
 
+            }
+
+            //adjust launch velocity
+            if(robot.dPadRight && !robot.isdPadRightPressedPrev){
+                if(robot.bButton && !robot.isbButtonPressedPrev){
+                    newLaunchVelocity = launchVelocity + incrementVelocity;
+                    if(newLaunchVelocity > robot.control.getLauncherAngPerSecLimit()){
+                        newLaunchVelocity = robot.control.getLauncherAngPerSecLimit();
+                    }
+                    robot.control.setLaunchVelocity(-newLaunchVelocity);
+                    launchVelocity = newLaunchVelocity;
+
+                }
+                if(robot.aButton && !robot.isaButtonPressedPrev){
+                    newLaunchVelocity = launchVelocity - incrementVelocity;
+                    if(newLaunchVelocity < 0.0){
+                        newLaunchVelocity = 0.0;
+                    }
+                    robot.control.setLaunchVelocity(-newLaunchVelocity);
+                    launchVelocity = newLaunchVelocity;
+                }
             }
 
 

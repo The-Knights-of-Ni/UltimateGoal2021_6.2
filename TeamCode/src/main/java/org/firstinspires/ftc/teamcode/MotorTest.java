@@ -59,7 +59,7 @@ public class MotorTest extends LinearOpMode {
         sleep(100);
 
         robot.control.setLaunchPower(power);
-        robot.control.setLaunchVelocity(velocity);
+        robot.control.setLaunchVelocity(-velocity);
 
         while(opModeIsActive()) {
             robot.getGamePadInputs();
@@ -85,7 +85,7 @@ public class MotorTest extends LinearOpMode {
                 if(newVelocity > LAUNCHER_ANG_PER_SEC_LIMIT){
                     newVelocity = LAUNCHER_ANG_PER_SEC_LIMIT;
                 }
-                robot.control.setLaunchVelocity(newVelocity);
+                robot.control.setLaunchVelocity(-newVelocity);
                 velocity = newVelocity;
 
             }
@@ -94,7 +94,7 @@ public class MotorTest extends LinearOpMode {
                 if(newVelocity < 0.0){
                     newVelocity = 0.0;
                 }
-                robot.control.setLaunchVelocity(newVelocity);
+                robot.control.setLaunchVelocity(-newVelocity);
                 velocity = newVelocity;
             }
 

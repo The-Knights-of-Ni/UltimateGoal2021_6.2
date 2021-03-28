@@ -123,6 +123,7 @@ public class Control extends Subsystem {
     private static final double     ELEVATOR_3RING_POS_R          = 0.33;
     private static final double     ELEVATOR_3RING_POS_L          = 0.649;
 
+    private static final double     LAUNCHER_ANG_PER_SEC_LIMIT = 722.0*2.0;
 
 
 
@@ -374,5 +375,9 @@ public class Control extends Subsystem {
 
     public double tickPerSecTORPM(double angPerSec){
         return ((angPerSec / 28.0) * 60.0);
+    }
+
+    public double getLauncherAngPerSecLimit(){
+        return LAUNCHER_ANG_PER_SEC_LIMIT;
     }
 }
