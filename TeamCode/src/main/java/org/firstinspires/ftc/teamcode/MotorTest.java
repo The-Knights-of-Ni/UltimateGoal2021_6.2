@@ -21,7 +21,7 @@ public class MotorTest extends LinearOpMode {
 
     private static final float mmPerInch        = 25.4f;
     private static final float mmTargetHeight   = (6) * mmPerInch;          // the height of the center of the target image above the floor
-
+    private static final double     LAUNCHER_ANG_PER_SEC_LIMIT = 722.0*2.0;
 
     private void initOpMode() throws IOException {
         telemetry.addData("Init Robot", "");
@@ -39,8 +39,9 @@ public class MotorTest extends LinearOpMode {
 
         double incrementPower = 0.1;
         double power = 1.0;
-        double incrementVelocity = 0.1;
-        double velocity;
+        double incrementVelocity = 20.0;
+        double velocity = 722.0; // ticks/sec
+        double rpm = robot.control.tickPerSecTORPM(velocity);
 
         try {
             initOpMode();
@@ -59,7 +60,7 @@ public class MotorTest extends LinearOpMode {
         while(opModeIsActive()) {
             robot.getGamePadInputs();
 
-            if(robot.bButton && !robot.isbButtonPressedPrev){
+            if(robot.yButton && !robot.isyButtonPressedPrev){
                 power = power + incrementPower;
                 if(power > 1.0){
                     power = 1.0;
@@ -67,7 +68,7 @@ public class MotorTest extends LinearOpMode {
                 robot.control.setLaunchPower(power);
 
             }
-            if(robot.aButton && !robot.isaButtonPressedPrev){
+            if(robot.bButton && !robot.isbButtonPressedPrev){
                 power = power - incrementPower;
                 if(power < 0.0){
                     power = 0.0;
@@ -75,7 +76,30 @@ public class MotorTest extends LinearOpMode {
                 robot.control.setLaunchPower(power);
 
             }
+            if(robot.bButton && !robot.isbButtonPressedPrev){
+                velocity = velocity + incrementVelocity;
+                if(velocity > LAUNCHER_ANG_PER_SEC_LIMIT){
+                    velocity = LAUNCHER_ANG_PER_SEC_LIMIT;
+                }
+                robot.control.setLaunchVelocity(velocity);
+
+            }
+            if(robot.aButton && !robot.isaButtonPressedPrev){
+                velocity = velocity - incrementVelocity;
+                if(velocity < 0.0){
+                    velocity = 0.0;
+                }
+                robot.control.setLaunchVelocity(velocity);
+            }
+            rpm = robot.control.tickPerSecTORPM(velocity);
+
+
             telemetry.addData("power: ", power);
+
+            telemetry.addData("L1  V: ", robot.control.tickPerSecTORPM(robot.launch1.getVelocity()));
+            telemetry.addData("L2a V: ", robot.control.tickPerSecTORPM(robot.launch2a.getVelocity()));
+            telemetry.addData("L2b V: ", robot.control.tickPerSecTORPM(robot.launch2b.getVelocity()));
+
             telemetry.update();
 
             int currentCountL1 = -robot.launch1.getCurrentPosition();

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Teleop;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -11,6 +12,8 @@ import java.io.IOException;
 
 
 @TeleOp(name="TeleopTest")
+@Disabled
+
 public class TeleopTest extends LinearOpMode {
 
     public final double TICKS_PER_REV = 537.6;

@@ -236,11 +236,11 @@ public class Robot extends Subsystem {
         elevatorL = hardwareMap.servo.get("elevatorL");
 
 
-        odometryA  = hardwareMap.get(DigitalChannel.class, "OdA");     //  Use generic form of device mapping
-        odometryB = hardwareMap.get(DigitalChannel.class, "OdB");    //  Use generic form of device mapping
-
-        odometryA.setMode(DigitalChannel.Mode.INPUT);          // Set the direction of each channel
-        odometryB.setMode(DigitalChannel.Mode.INPUT);
+//        odometryA  = hardwareMap.get(DigitalChannel.class, "OdA");     //  Use generic form of device mapping
+//        odometryB = hardwareMap.get(DigitalChannel.class, "OdB");    //  Use generic form of device mapping
+//
+//        odometryA.setMode(DigitalChannel.Mode.INPUT);          // Set the direction of each channel
+//        odometryB.setMode(DigitalChannel.Mode.INPUT);
 
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");

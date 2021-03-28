@@ -60,6 +60,7 @@ import java.io.IOException;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 @TeleOp(name = "Odometry Test", group = "Sensor")
+@Disabled
 public class OdometryTest extends LinearOpMode {
 
     final int BLUE_LED_CHANNEL = 0;

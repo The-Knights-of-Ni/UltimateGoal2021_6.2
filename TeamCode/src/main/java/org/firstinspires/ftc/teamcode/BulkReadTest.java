@@ -75,6 +75,8 @@ import java.util.List;
 
  */
 @TeleOp (name = "BulkReadTest", group = "Tests")
+@Disabled
+
 public class BulkReadTest extends LinearOpMode {
 
     final int       TEST_CYCLES    = 500;   // Number of control cycles to run to determine cycle times.

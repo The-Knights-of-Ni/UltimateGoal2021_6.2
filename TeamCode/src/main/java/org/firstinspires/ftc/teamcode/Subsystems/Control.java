@@ -314,6 +314,12 @@ public class Control extends Subsystem {
             launch2b.setPower(-launchPower);
     }
 
+    public void setLaunchVelocity(double angularRate){
+        launch1.setVelocity(angularRate);
+        launch2a.setVelocity(angularRate);
+        launch2b.setVelocity(angularRate);
+    }
+
     public int getElevatorStage(){
         return elevatorStage;
     }
@@ -364,5 +370,9 @@ public class Control extends Subsystem {
     public double autoRotateTurret() {
         double angle = 0;
         return angle;
+    }
+
+    public double tickPerSecTORPM(double angPerSec){
+        return ((angPerSec / 28.0) * 60.0);
     }
 }
