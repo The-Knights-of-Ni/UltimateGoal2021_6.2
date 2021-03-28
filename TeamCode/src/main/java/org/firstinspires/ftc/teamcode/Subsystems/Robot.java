@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -46,6 +47,13 @@ public class Robot extends Subsystem {
     public Servo intakeToElevatorR;
     public Servo launcherFeederL;
     public Servo launcherFeederR;
+
+    //Odometry
+    public DigitalChannel odometryA;
+    public DigitalChannel odometryB;
+    public int odLCount;
+
+
     /**
      * Control Hub
      *
@@ -226,6 +234,13 @@ public class Robot extends Subsystem {
 
         elevatorR = hardwareMap.servo.get("elevatorR");
         elevatorL = hardwareMap.servo.get("elevatorL");
+
+
+        odometryA  = hardwareMap.get(DigitalChannel.class, "OdA");     //  Use generic form of device mapping
+        odometryB = hardwareMap.get(DigitalChannel.class, "OdB");    //  Use generic form of device mapping
+
+        odometryA.setMode(DigitalChannel.Mode.INPUT);          // Set the direction of each channel
+        odometryB.setMode(DigitalChannel.Mode.INPUT);
 
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");

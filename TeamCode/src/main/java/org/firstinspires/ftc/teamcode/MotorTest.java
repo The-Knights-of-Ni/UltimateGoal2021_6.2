@@ -36,6 +36,10 @@ public class MotorTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException{
+
+        double increment = 0.1;
+        double power = 1.0;
+
         try {
             initOpMode();
         } catch (IOException e) {
@@ -48,9 +52,29 @@ public class MotorTest extends LinearOpMode {
         telemetry.update();
         sleep(100);
 
-        robot.control.setLaunchPower(1.0 );
+        robot.control.setLaunchPower(power);
 
         while(opModeIsActive()) {
+            robot.getGamePadInputs();
+
+            if(robot.bButton && !robot.isbButtonPressedPrev){
+                power = power + increment;
+                if(power > 1.0){
+                    power = 1.0;
+                }
+                robot.control.setLaunchPower(power);
+
+            }
+            if(robot.bButton && !robot.isbButtonPressedPrev){
+                power = power - increment;
+                if(power < 0.0){
+                    power = 0.0;
+                }
+                robot.control.setLaunchPower(power);
+
+            }
+            telemetry.addData("power: ", power);
+            telemetry.update();
 
             int currentCountL1 = -robot.launch1.getCurrentPosition();
             double currentTimeFL = ((double) (timer.nanoseconds() - startTime)) * 1.0e-6;

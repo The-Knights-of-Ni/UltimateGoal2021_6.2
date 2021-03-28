@@ -8,12 +8,11 @@ import org.firstinspires.ftc.teamcode.Teleop.TeleopMark2;
 public class WobbleGoalArmTeleopThread extends Thread{
 
     private double wobbleGoalArmNewPos;
-    private double wobbleGoalArmIncrement = 0.1;
+    private double wobbleGoalArmIncrement = 0.02;
     private double currentPos = 0.0;
     private TeleopMark2 teleopMark2;
     private OpMode opMode;
     private Robot robot;
-
     public WobbleGoalArmTeleopThread(TeleopMark2 teleopMark2) {
         this.setName("WobbleGoalArmTeleopThread");
         this.teleopMark2 = teleopMark2;
@@ -85,7 +84,7 @@ public class WobbleGoalArmTeleopThread extends Thread{
                 }
 
 //                teleopMark2.telemetry.update();
-                sleep(200);
+                sleep(50);
 
 //
 
