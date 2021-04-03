@@ -80,7 +80,8 @@ public class TeleopMark2 extends LinearOpMode {
         robot.control.openIntakeToElevator();
         robot.control.moveElevatorToBottom();
         robot.wobbleGoalArm.setPosition(0.0);
-        robot.control.closeWobbleGoalClaw();
+//        robot.control.moveWobbleGoalArmDown();
+        robot.control.openWideWobbleGoalClaw();
     }
 
     @Override

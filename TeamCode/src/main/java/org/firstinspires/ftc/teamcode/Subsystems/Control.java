@@ -111,27 +111,36 @@ public class Control extends Subsystem {
     private static final double     WOBBLE_GOAL_CLAW_OPEN_WIDE   = 0.9;
     private static final double     WOBBLE_GOAL_CLAW_CLOSED      = 0.39;
 
-    private static final double     INTAKE_TO_ELEVATOR_R_OPEN    = 0.54;
-    private static final double     INTAKE_TO_ELEVATOR_R_CLOSE   = 0.18;
-    private static final double     INTAKE_TO_ELEVATOR_L_OPEN    = 0.48;
-    private static final double     INTAKE_TO_ELEVATOR_L_CLOSE   = 0.8;
+    private static final double     INTAKE_TO_ELEVATOR_R_OPEN    = 0.435;
+    private static final double     INTAKE_TO_ELEVATOR_R_CLOSE   = 0.089;
+    private static final double     INTAKE_TO_ELEVATOR_L_OPEN    = 0.56;
+    private static final double     INTAKE_TO_ELEVATOR_L_CLOSE   = 0.905;
 
-    private static final double     LAUNCHER_FEEDER_R_LAUNCH     = 0.279;
-    private static final double     LAUNCHER_FEEDER_R_REST       = 0.56;
-    private static final double     LAUNCHER_FEEDER_L_LAUNCH     = 0.70;
-    private static final double     LAUNCHER_FEEDER_L_REST       = 0.39;
+    private static final double     LAUNCHER_FEEDER_R_LAUNCH     = 0.470;
+    private static final double     LAUNCHER_FEEDER_R_REST       = 0.580;
+    private static final double     LAUNCHER_FEEDER_L_LAUNCH     = 0.700;
+    private static final double     LAUNCHER_FEEDER_L_REST       = 0.385;
 
-    private static final double     ELEVATOR_BOTTOM_POS_R         = 0.820;
-    private static final double     ELEVATOR_BOTTOM_POS_L         = 0.170;
+    private static final double     ELEVATOR_BOTTOM_POS_R         = 0.815;
+    private static final double     ELEVATOR_BOTTOM_POS_L         = 0.105;
 
-    private static final double     ELEVATOR_1RING_POS_R          = 0.192;
-    private static final double     ELEVATOR_1RING_POS_L          = 0.808;
+    private static final double     ELEVATOR_1RING_POS_R          = 0.153;
+    private static final double     ELEVATOR_1RING_POS_L          = 0.823;
 
-    private static final double     ELEVATOR_2RING_POS_R          = 0.30;
-    private static final double     ELEVATOR_2RING_POS_L          = 0.70;
+    private static final double     ELEVATOR_2RING_POS_R          = 0.274;
+    private static final double     ELEVATOR_2RING_POS_L          = 0.704;
 
-    private static final double     ELEVATOR_3RING_POS_R          = 0.424;
-    private static final double     ELEVATOR_3RING_POS_L          = 0.574 ;
+    private static final double     ELEVATOR_3RING_POS_R          = 0.389;
+    private static final double     ELEVATOR_3RING_POS_L          = 0.570;
+
+    private static final double     ELEVATOR_1RING_LAUNCH_POS_R          = 0.313;
+    private static final double     ELEVATOR_1RING_LAUNCH_POS_L          = 0.673;
+
+    private static final double     ELEVATOR_2RING_LAUNCH_POS_R          = 0.394;
+    private static final double     ELEVATOR_2RING_LAUNCH_POS_L          = 0.588;
+
+    private static final double     ELEVATOR_3RING_LAUNCH_POS_R          = 0.529;
+    private static final double     ELEVATOR_3RING_LAUNCH_POS_L          = 0.444 ;
 
     private static final double     LAUNCHER_ANG_PER_SEC_LIMIT = 722.0*2.0;
 
@@ -292,6 +301,14 @@ public class Control extends Subsystem {
         launcherFeederL.setPosition(LAUNCHER_FEEDER_L_LAUNCH);
     }
 
+    public void launchLauncherFeeder1(){
+        launcherFeederR.setPosition(LAUNCHER_FEEDER_R_LAUNCH);
+    }
+
+    public void launchLauncherFeeder2(){
+        launcherFeederL.setPosition(LAUNCHER_FEEDER_L_LAUNCH);
+    }
+
     public void setIntake(boolean status){
         if(status){
             intake.setPower(1.0);
@@ -364,6 +381,28 @@ public class Control extends Subsystem {
             case 3:
                 elevatorR.setPosition(ELEVATOR_1RING_POS_R);
                 elevatorL.setPosition(ELEVATOR_1RING_POS_L);
+                break;
+        }
+    }
+
+    // lower elevator to launch position to get better angle when ring contacts with fly wheel
+    public void moveElevatorLaunch(){
+        switch(elevatorStage){
+            case 0:
+                elevatorR.setPosition(ELEVATOR_BOTTOM_POS_R);
+                elevatorL.setPosition(ELEVATOR_BOTTOM_POS_L);
+                break;
+            case 1:
+                elevatorR.setPosition(ELEVATOR_3RING_LAUNCH_POS_R);
+                elevatorL.setPosition(ELEVATOR_3RING_LAUNCH_POS_L);
+                break;
+            case 2:
+                elevatorR.setPosition(ELEVATOR_2RING_LAUNCH_POS_R);
+                elevatorL.setPosition(ELEVATOR_2RING_LAUNCH_POS_L);
+                break;
+            case 3:
+                elevatorR.setPosition(ELEVATOR_1RING_LAUNCH_POS_R);
+                elevatorL.setPosition(ELEVATOR_1RING_LAUNCH_POS_L);
                 break;
         }
     }

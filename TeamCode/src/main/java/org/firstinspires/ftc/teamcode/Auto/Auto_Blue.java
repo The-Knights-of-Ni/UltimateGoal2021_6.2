@@ -79,6 +79,7 @@ public class Auto_Blue extends LinearOpMode {
             e.printStackTrace();
         }
         waitForStart();
+        telemetry.addLine("afterWaitForStart");
 
         //Detect rings
         String numRings = null;
@@ -90,21 +91,25 @@ public class Auto_Blue extends LinearOpMode {
                 break;
             case ONE:
                 numRings = "ONE";
-                robot.getOpmode().telemetry.addData("[Ring Stack] >>", numRings);
-                robot.getOpmode().telemetry.update();
+                telemetry.addData("[Ring Stack] >>", numRings);
+                telemetry.update();
                 break;
             case FOUR:
                 numRings = "FOUR";
-                robot.getOpmode().telemetry.addData("[Ring Stack] >>", numRings);
-                robot.getOpmode().telemetry.update();
+                telemetry.addData("[Ring Stack] >>", numRings);
+                telemetry.update();
                 break;
         }
+        telemetry.addLine("afterDetectRings");
 
         // deploy claw and grab wobble goal
 //        robot.control.openWobbleGoalClaw();   // claws are already open at startup
         robot.control.raiseWobbleGoalArmLow();
+        sleep(500);
         robot.control.closeWobbleGoalClaw();
+        sleep(500);
         robot.control.raiseWobbleGoalArmMed();
+        sleep(500);
 
         // move to launch line
         launchPos = 56.0;
@@ -112,6 +117,7 @@ public class Auto_Blue extends LinearOpMode {
 
         // launch rings
         launchRings();
+
 
         if(numRings.equals("ZERO")) {
             robot.drive.moveForward((70.75-launchPos)*mmPerInch);
@@ -128,10 +134,12 @@ public class Auto_Blue extends LinearOpMode {
 
         // deploy claw and drop wobble goal
         robot.control.raiseWobbleGoalArmLow();
+        sleep(500);
         robot.control.openWideWobbleGoalClaw();
+        sleep(500);
         robot.control.moveWobbleGoalArmDown();
+        sleep(500);
 
-        sleep(6000);
 
         // park robot
         if(numRings.equals("ZERO")) {
@@ -154,37 +162,41 @@ public class Auto_Blue extends LinearOpMode {
     private void launchRings() {
 
         // start launcher
-        robot.control.setLaunchVelocity(722.0);
+        robot.control.setLaunchVelocity(-800.0); //722
 
         // wait for launch motor to stablize
-        sleep(4000);
+        sleep(5000);
 
         // scoop rings to the back
         robot.control.closeIntakeToElevator();
         sleep(600);
         robot.control.openIntakeToElevator();
-        sleep(300);
+        sleep(400);
 
         // raise elevator
         robot.control.moveElevator(1);
+        sleep(1000);
 
         // launch first ring
         robot.control.launchLauncherFeeder();
-        sleep(350);
+        sleep(1000);
         robot.control.restLauncherFeeder();
-        sleep(355);
+        sleep(1000);
 
         // raise elevator
         robot.control.moveElevator(1);
+        sleep(500);
+
 
         // launch second ring
         robot.control.launchLauncherFeeder();
-        sleep(350);
+        sleep(1000);
         robot.control.restLauncherFeeder();
-        sleep(355);
+        sleep(1000);
 
         // lower elevator to floor
         robot.control.moveElevatorToBottom();
+        sleep(1000);
 
     }
 }

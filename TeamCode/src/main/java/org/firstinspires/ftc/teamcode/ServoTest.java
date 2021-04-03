@@ -111,33 +111,33 @@ public class ServoTest extends LinearOpMode {
             }
 
             //wobble Goal claw and arm
-            if(robot.leftStickY > 0.5){
+            if(robot.leftStickX > 0.5){
                 robot.wobbleGoalArm.setPosition(robot.wobbleGoalArm.getPosition() + absIncrementStep);
             }
-            else if(robot.leftStickY < -0.5){
+            else if(robot.leftStickX < -0.5){
                 robot.wobbleGoalArm.setPosition(robot.wobbleGoalArm.getPosition() - absIncrementStep);
             }
-            if(robot.rightStickY > 0.5){
+            if(robot.rightStickX > 0.5){
                 robot.wobbleClaw.setPosition(robot.wobbleClaw.getPosition() + absIncrementStep);
             }
-            else if(robot.rightStickY < -0.5){
+            else if(robot.rightStickX < -0.5){
                 robot.wobbleClaw.setPosition(robot.wobbleClaw.getPosition() - absIncrementStep);
             }
 
-//            //launcher feeder
-//            if(robot.leftStickY2 > 0.5){
-//                robot.launcherFeederL.setPosition(robot.launcherFeederL.getPosition() + absIncrementStep);
-//            }
-//            else if(robot.leftStickY2 < -0.5){
-//                robot.launcherFeederL.setPosition(robot.launcherFeederL.getPosition() - absIncrementStep);
-//            }
-//
-//            if(robot.rightStickY2 > 0.5){
-//                robot.launcherFeederR.setPosition(robot.launcherFeederR.getPosition() + absIncrementStep);
-//            }
-//            else if(robot.rightStickY2 < -0.5){
-//                robot.launcherFeederR.setPosition(robot.launcherFeederR.getPosition() - absIncrementStep);
-//            }d
+            //launcher feeder
+            if(robot.leftStickY2 > 0.5){
+                robot.launcherFeederL.setPosition(robot.launcherFeederL.getPosition() + absIncrementStep);
+            }
+            else if(robot.leftStickY2 < -0.5){
+                robot.launcherFeederL.setPosition(robot.launcherFeederL.getPosition() - absIncrementStep);
+            }
+
+            if(robot.rightStickY2 > 0.5){
+                robot.launcherFeederR.setPosition(robot.launcherFeederR.getPosition() + absIncrementStep);
+            }
+            else if(robot.rightStickY2 < -0.5){
+                robot.launcherFeederR.setPosition(robot.launcherFeederR.getPosition() - absIncrementStep);
+            }
 
 
 
@@ -149,10 +149,10 @@ public class ServoTest extends LinearOpMode {
             telemetry.addData("Wobble Goal Claw  ", "%.3f", robot.wobbleClaw.getPosition());
             telemetry.addData("Wobble Goal Arm      ", "%.3f", robot.wobbleGoalArm.getPosition());
 
-            telemetry.addData("Elevator R  ", "%.3f", robot.elevatorR.getPosition());
-            telemetry.addData("Elevator L      ", "%.3f", robot.elevatorL.getPosition());
+            telemetry.addData("Elevator L ", "%.3f", robot.elevatorL.getPosition());
+            telemetry.addData("Elevator R ", "%.3f", robot.elevatorR.getPosition());
 
-            telemetry.addData("intake to elevator R   ", "%.3f", robot.intakeToElevatorR.getPosition());
+            telemetry.addData("intake to elevator R ", "%.3f", robot.intakeToElevatorR.getPosition());
             telemetry.addData("intake to Elevator L   ", "%.3f", robot.intakeToElevatorL.getPosition());
 
             telemetry.addData("Launcher Feeder R      ", "%.3f", robot.launcherFeederR.getPosition());

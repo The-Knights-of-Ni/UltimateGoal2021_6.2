@@ -22,10 +22,15 @@ public class IntakeToElevatorThread extends Thread{
     // signaled by main code calling thread.interrupt.
     public void run() {
         int evenValue = 0;
+        Boolean isMovingElevator;
         try {
 
             while (!isInterrupted()) {
-                if ((robot.bumperRight && !robot.isrBumperPressedPrev) || (robot.dPadUp && !robot.isdPadUpPressedPrev && (robot.control.getElevatorStage() == 0))) {
+                if (robot.dPadUp && !robot.isdPadUpPressedPrev && (robot.control.getElevatorStage() == 0))
+                    isMovingElevator = true;
+                else
+                    isMovingElevator = false;
+                if ((robot.bumperRight && !robot.isrBumperPressedPrev) || isMovingElevator) {
                     if (isIntakeToElevator) {
                         isIntakeToElevator = false;
                     } else {
@@ -33,7 +38,7 @@ public class IntakeToElevatorThread extends Thread{
                         sleep(600);
                         robot.control.openIntakeToElevator();
                         sleep(300);
-                        if(robot.control.getElevatorStage() == 0){
+                        if(isMovingElevator){
                             robot.control.moveElevator(1);
                         }
                         isIntakeToElevator = true;

@@ -281,7 +281,7 @@ public class Robot extends Subsystem {
 
         opMode.telemetry.addData("Mode", " vision initializing...");
         opMode.telemetry.update();
-//        vision = new Vision(hardwareMap, this, isBlue);
+        vision = new Vision(hardwareMap, this, isBlue);
 
     }
 
@@ -294,7 +294,7 @@ public class Robot extends Subsystem {
     }
 
     public void initServosTeleop() {
-        control.retractWobble();
+        control.moveWobbleGoalArmDown();
         control.closeWobbleGoalClaw();
     }
 

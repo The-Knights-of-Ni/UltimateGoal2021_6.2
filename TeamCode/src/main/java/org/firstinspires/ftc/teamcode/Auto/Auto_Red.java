@@ -108,7 +108,7 @@ public class Auto_Red extends LinearOpMode {
         // deploy claw and drop wobble goal
         robot.control.deployWobble();
         robot.control.openWobbleGoalClaw();
-        robot.control.retractWobble();
+        robot.control.moveWobbleGoalArmDown();
         robot.control.closeWobbleGoalClaw();
 
         sleep(6000);
