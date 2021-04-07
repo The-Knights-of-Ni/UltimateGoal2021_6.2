@@ -2,17 +2,19 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.List;
 
 /**
- * odometry thread - read and decode odometry digital IO
- * created by Andrew Chiang on 3/24/2021
+ * launcher thread - control launcher motor RPM
+ * created by Andrew Chiang on 4/4/2021
  */
-public class OdometryThread extends Thread{
+public class LauncherThread extends Thread{
 
     private Robot robot;
     private OpMode opMode;
+    private ElapsedTime timer;
     private boolean isLauncherFeeder = false;
     private boolean odRAPrev = false;
     private boolean odRBPrev = false;
@@ -28,10 +30,10 @@ public class OdometryThread extends Thread{
     private boolean odLBCurrent = false;
 
 
-    public OdometryThread(OpMode opMode, Robot robot) {
-        this.setName("OdometryThread");
+    public LauncherThread(OpMode opMode, Robot robot) {
+        this.setName("LauncherThread");
         this.robot = robot;
-        opMode.telemetry.addData("OdometryThread ", this.getName());
+        opMode.telemetry.addData("Started: ", this.getName());
         opMode.telemetry.update();
     }
 

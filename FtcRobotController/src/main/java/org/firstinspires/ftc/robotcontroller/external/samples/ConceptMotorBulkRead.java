@@ -33,6 +33,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -75,7 +76,7 @@ import java.util.List;
 
      */
 @TeleOp (name = "Motor Bulk Reads", group = "Tests")
-@Disabled
+//@Disabled
 public class ConceptMotorBulkRead extends LinearOpMode {
 
     final int       TEST_CYCLES    = 500;   // Number of control cycles to run to determine cycle times.
@@ -95,10 +96,15 @@ public class ConceptMotorBulkRead extends LinearOpMode {
         int cycles;
 
         // Important Step 1:  Make sure you use DcMotorEx when you instantiate your motors.
-        m1 = hardwareMap.get(DcMotorEx.class, "m1");  // Configure the robot to use these 4 motor names,
-        m2 = hardwareMap.get(DcMotorEx.class, "m2");  // or change these strings to match your existing Robot Configuration.
-        m3 = hardwareMap.get(DcMotorEx.class, "m3");
-        m4 = hardwareMap.get(DcMotorEx.class, "m4");
+        m1 = hardwareMap.get(DcMotorEx.class, "fr");  // Configure the robot to use these 4 motor names,
+        m2 = hardwareMap.get(DcMotorEx.class, "fl");  // or change these strings to match your existing Robot Configuration.
+        m3 = hardwareMap.get(DcMotorEx.class, "br");
+        m4 = hardwareMap.get(DcMotorEx.class, "bl");
+
+        m1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        m2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        m3.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        m4.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Important Step 2: Get access to a list of Expansion Hub Modules to enable changing caching methods.
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
@@ -127,10 +133,10 @@ public class ConceptMotorBulkRead extends LinearOpMode {
             e3 = m3.getCurrentPosition();
             e4 = m4.getCurrentPosition();
 
-            v1 = m1.getVelocity();
-            v2 = m2.getVelocity();
-            v3 = m3.getVelocity();
-            v4 = m4.getVelocity();
+//            v1 = m1.getVelocity();
+//            v2 = m2.getVelocity();
+//            v3 = m3.getVelocity();
+//            v4 = m4.getVelocity();
 
             // Put Control loop action code here.
 
@@ -157,10 +163,10 @@ public class ConceptMotorBulkRead extends LinearOpMode {
             e3 = m3.getCurrentPosition();
             e4 = m4.getCurrentPosition();
 
-            v1 = m1.getVelocity();
-            v2 = m2.getVelocity();
-            v3 = m3.getVelocity();
-            v4 = m4.getVelocity();
+//            v1 = m1.getVelocity();
+//            v2 = m2.getVelocity();
+//            v3 = m3.getVelocity();
+//            v4 = m4.getVelocity();
 
             // Put Control loop action code here.
 
@@ -194,10 +200,10 @@ public class ConceptMotorBulkRead extends LinearOpMode {
             e3 = m3.getCurrentPosition();   // but they will return the same data.
             e4 = m4.getCurrentPosition();
 
-            v1 = m1.getVelocity();
-            v2 = m2.getVelocity();
-            v3 = m3.getVelocity();
-            v4 = m4.getVelocity();
+//            v1 = m1.getVelocity();
+//            v2 = m2.getVelocity();
+//            v3 = m3.getVelocity();
+//            v4 = m4.getVelocity();
 
             // Put Control loop action code here.
 

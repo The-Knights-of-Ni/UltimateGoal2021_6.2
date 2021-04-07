@@ -29,17 +29,8 @@ public class LauncherFeederThread extends Thread{
                         isLauncherFeeder = false;
                     }
                     else{
-                        robot.control.launchLauncherFeeder1();
-                        sleep(200);
-                        robot.control.moveElevatorLaunch();
-                        sleep(200);
-                        robot.control.launchLauncherFeeder2();
-                        robot.control.closeIntakeToElevator();
+                        robot.control.launchOneRing();
                         sleep(550);
-                        robot.control.restLauncherFeeder();
-                        robot.control.openIntakeToElevator();
-                        sleep(355);
-                        robot.control.moveElevator(1);
                         isLauncherFeeder = true;
                     }
                 }

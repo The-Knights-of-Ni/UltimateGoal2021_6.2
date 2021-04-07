@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -14,6 +15,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by AndrewC on 12/27/2019.
@@ -49,9 +51,16 @@ public class Robot extends Subsystem {
     public Servo launcherFeederR;
 
     //Odometry
-    public DigitalChannel odometryA;
-    public DigitalChannel odometryB;
-    public int odLCount;
+    public List<LynxModule> allHubs;
+    public DigitalChannel odometryRA;
+    public DigitalChannel odometryRB;
+    public DigitalChannel odometryBA;
+    public DigitalChannel odometryBB;
+    public DigitalChannel odometryLA;
+    public DigitalChannel odometryLB;
+    public int odRCount = 0;
+    public int odBCount = 0;
+    public int odLCount = 0;
 
 
     /**
@@ -214,7 +223,8 @@ public class Robot extends Subsystem {
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        intake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intake.setPower(0.0);
 
         //Servos
@@ -235,12 +245,21 @@ public class Robot extends Subsystem {
         elevatorR = hardwareMap.servo.get("elevatorR");
         elevatorL = hardwareMap.servo.get("elevatorL");
 
+        allHubs = hardwareMap.getAll(LynxModule.class);
 
-//        odometryA  = hardwareMap.get(DigitalChannel.class, "OdA");     //  Use generic form of device mapping
-//        odometryB = hardwareMap.get(DigitalChannel.class, "OdB");    //  Use generic form of device mapping
-//
-//        odometryA.setMode(DigitalChannel.Mode.INPUT);          // Set the direction of each channel
-//        odometryB.setMode(DigitalChannel.Mode.INPUT);
+        odometryRA  = hardwareMap.get(DigitalChannel.class, "odra");
+        odometryRB = hardwareMap.get(DigitalChannel.class, "odrb");
+        odometryBA  = hardwareMap.get(DigitalChannel.class, "odba");
+        odometryBB = hardwareMap.get(DigitalChannel.class, "odbb");
+        odometryLA  = hardwareMap.get(DigitalChannel.class, "odla");
+        odometryLB = hardwareMap.get(DigitalChannel.class, "odlb");
+
+        odometryRA.setMode(DigitalChannel.Mode.INPUT);          // Set the direction of each channel
+        odometryRB.setMode(DigitalChannel.Mode.INPUT);
+        odometryBA.setMode(DigitalChannel.Mode.INPUT);          // Set the direction of each channel
+        odometryBB.setMode(DigitalChannel.Mode.INPUT);
+        odometryLA.setMode(DigitalChannel.Mode.INPUT);          // Set the direction of each channel
+        odometryLB.setMode(DigitalChannel.Mode.INPUT);
 
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");

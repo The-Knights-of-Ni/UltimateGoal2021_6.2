@@ -41,30 +41,12 @@ import org.firstinspires.ftc.teamcode.Subsystems.Robot;
 
 import java.io.IOException;
 
-/*
- * This is an example LinearOpMode that shows how to use the digital inputs and outputs on the
- * the Modern Robotics Device Interface Module.  In addition, it shows how to use the Red and Blue LED
- *
- * This op mode assumes that there is a Device Interface Module attached, named 'dim'.
- * On this DIM there is a digital input named 'digin' and an output named 'digout'
- *
- * To fully exercise this sample, connect pin 3 of the digin connector to pin 3 of the digout.
- * Note: Pin 1 is indicated by the black stripe, so pin 3 is at the opposite end.
- *
- * The X button on the gamepad will be used to activate the digital output pin.
- * The Red/Blue LED will be used to indicate the state of the digital input pin.
- * Blue = false (0V), Red = true (5V)
- * If the two pins are linked, the gamepad will change the LED color.
- *
- * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
+/**
+ * test odometry thread
+ * created by Andrew Chiang on 3/26/2021
  */
 @TeleOp(name = "Odometry Test", group = "Sensor")
-@Disabled
 public class OdometryTest extends LinearOpMode {
-
-    final int BLUE_LED_CHANNEL = 0;
-    final int RED_LED_CHANNEL = 1;
 
     private Robot robot;
     ElapsedTime timer;
@@ -83,11 +65,16 @@ public class OdometryTest extends LinearOpMode {
 
         waitForStart();
         odometryTread.start();
+        odometryTread.setPriority(Thread.MAX_PRIORITY);
 
         while (opModeIsActive())  {
 
-            telemetry.addData("count ",robot.odLCount);
+            telemetry.addData("od count R ",robot.odRCount);
+            telemetry.addData("od count B ",robot.odBCount);
+            telemetry.addData("od count L ",robot.odLCount);
+            telemetry.addData("intake count ",robot.intake.getCurrentPosition());
             telemetry.update();
+            sleep(500);
         }
         odometryTread.interrupt();
     }

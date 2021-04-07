@@ -102,6 +102,9 @@ public class Auto_Blue extends LinearOpMode {
         }
         telemetry.addLine("afterDetectRings");
 
+        // start launcher motors
+        startLauncher();
+
         // deploy claw and grab wobble goal
 //        robot.control.openWobbleGoalClaw();   // claws are already open at startup
         robot.control.raiseWobbleGoalArmLow();
@@ -159,13 +162,18 @@ public class Auto_Blue extends LinearOpMode {
 
     }
 
-    private void launchRings() {
-
+    private void startLauncher() {
         // start launcher
         robot.control.setLaunchVelocity(-800.0); //722
+    }
 
-        // wait for launch motor to stablize
-        sleep(5000);
+    private void launchRings() throws InterruptedException {
+
+//        // start launcher
+//        robot.control.setLaunchVelocity(-800.0); //722
+//
+//        // wait for launch motor to stabilize
+//        sleep(5000);
 
         // scoop rings to the back
         robot.control.closeIntakeToElevator();
@@ -178,25 +186,18 @@ public class Auto_Blue extends LinearOpMode {
         sleep(1000);
 
         // launch first ring
-        robot.control.launchLauncherFeeder();
+        robot.control.launchOneRing();
         sleep(1000);
-        robot.control.restLauncherFeeder();
-        sleep(1000);
-
-        // raise elevator
-        robot.control.moveElevator(1);
-        sleep(500);
-
 
         // launch second ring
-        robot.control.launchLauncherFeeder();
+        robot.control.launchOneRing();
         sleep(1000);
-        robot.control.restLauncherFeeder();
-        sleep(1000);
+
+        // launch third ring
+        robot.control.launchOneRing();
 
         // lower elevator to floor
         robot.control.moveElevatorToBottom();
-        sleep(1000);
 
     }
 }

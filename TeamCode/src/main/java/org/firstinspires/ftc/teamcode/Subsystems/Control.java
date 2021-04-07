@@ -8,11 +8,14 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import static java.lang.Thread.sleep;
+
 /**
  * Control subsystem for controlling arms and claws
  * Created by AndrewC on 1/17/2020
  */
-public class Control extends Subsystem {
+public class
+Control extends Subsystem {
     // device declaration
     private HardwareMap hardwareMap;
     private LinearOpMode opMode;
@@ -102,14 +105,15 @@ public class Control extends Subsystem {
     private static final double     WB_CLAW_POS_CLOSED                = 0;
 
     private static final double     WOBBLE_GOAL_ARM_DOWN         = 0.0;
-    private static final double     WOBBLE_GOAL_ARM_LOW          = 0.249;
-    private static final double     WOBBLE_GOAL_ARM_MED          = 0.378;
+    private static final double     WOBBLE_GOAL_ARM_LOW          = 0.180;
+    private static final double     WOBBLE_GOAL_ARM_MED          = 0.320;
+    private static final double     WOBBLE_GOAL_ARM_HIGH          = 0.460;
 
 
 
-    private static final double     WOBBLE_GOAL_CLAW_OPEN        = 0.63;
-    private static final double     WOBBLE_GOAL_CLAW_OPEN_WIDE   = 0.9;
-    private static final double     WOBBLE_GOAL_CLAW_CLOSED      = 0.39;
+    private static final double     WOBBLE_GOAL_CLAW_OPEN        = 0.459;
+    private static final double     WOBBLE_GOAL_CLAW_OPEN_WIDE   = 0.579;
+    private static final double     WOBBLE_GOAL_CLAW_CLOSED      = 0.214;
 
     private static final double     INTAKE_TO_ELEVATOR_R_OPEN    = 0.435;
     private static final double     INTAKE_TO_ELEVATOR_R_CLOSE   = 0.089;
@@ -252,6 +256,22 @@ public class Control extends Subsystem {
         wobbleClaw.setPosition(WOBBLE_GOAL_CLAW_CLOSED);
     }
     public void openWideWobbleGoalClaw(){wobbleClaw.setPosition(WOBBLE_GOAL_CLAW_OPEN_WIDE);};
+
+    public void moveWobbleGoalArmDown(){
+        wobbleGoalArm.setPosition(WOBBLE_GOAL_ARM_DOWN);
+    }
+
+    public void raiseWobbleGoalArmLow(){
+        wobbleGoalArm.setPosition(WOBBLE_GOAL_ARM_LOW);
+    }
+
+    public void raiseWobbleGoalArmMed(){
+        wobbleGoalArm.setPosition(WOBBLE_GOAL_ARM_MED);
+    }
+
+    public void raiseWobbleGoalArmHigh(){
+        wobbleGoalArm.setPosition(WOBBLE_GOAL_ARM_HIGH);
+    }
 
     public void deployWobble() {
         wobbleGoalArm.setPosition(0.934);
@@ -408,10 +428,24 @@ public class Control extends Subsystem {
     }
 
     public void moveElevatorToBottom(){
+        elevatorStage = 0;
         elevatorR.setPosition(ELEVATOR_BOTTOM_POS_R);
         elevatorL.setPosition(ELEVATOR_BOTTOM_POS_L);
     }
 
+    public void launchOneRing() throws InterruptedException {
+        launchLauncherFeeder1();
+        sleep(200);
+        moveElevatorLaunch();
+        sleep(200);
+        launchLauncherFeeder2();
+        closeIntakeToElevator();
+        sleep(550);
+        restLauncherFeeder();
+        openIntakeToElevator();
+        sleep(355);
+        moveElevator(1);
+    }
 
     public void modifyServo(Servo servo, double value) {
         double currentValue = servo.getPosition();
@@ -424,18 +458,6 @@ public class Control extends Subsystem {
     public double autoRotateTurret() {
         double angle = 0;
         return angle;
-    }
-
-    public void moveWobbleGoalArmDown(){
-        wobbleGoalArm.setPosition(WOBBLE_GOAL_ARM_DOWN);
-    }
-
-    public void raiseWobbleGoalArmLow(){
-        wobbleGoalArm.setPosition(WOBBLE_GOAL_ARM_LOW);
-    }
-
-    public void raiseWobbleGoalArmMed(){
-        wobbleGoalArm.setPosition(WOBBLE_GOAL_ARM_MED);
     }
 
     public double tickPerSecTORPM(double angPerSec){
