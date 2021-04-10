@@ -2,11 +2,15 @@ package org.firstinspires.ftc.teamcode;
 
 import android.util.Log;
 
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Subsystems.IntakeToElevatorThread;
+import org.firstinspires.ftc.teamcode.Subsystems.LauncherFeederThread;
 import org.firstinspires.ftc.teamcode.Subsystems.Robot;
+import org.firstinspires.ftc.teamcode.Subsystems.WobbleGoalArmTeleopThread;
 
 import java.io.IOException;
 
@@ -31,27 +35,42 @@ public class MotorTest extends LinearOpMode {
     private static final float mmTargetHeight   = (6) * mmPerInch;          // the height of the center of the target image above the floor
     private static final double     LAUNCHER_ANG_PER_SEC_LIMIT = 722.0*2.0;
 
-    private void initOpMode() throws IOException {
+    private void initOpMode() {
         telemetry.addData("Init Robot", "");
         telemetry.update();
+        //Initialize DC motor objects
         timer = new ElapsedTime();
-
-        robot = new Robot(this, timer);
+        try {
+            robot = new Robot(this, timer, true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         telemetry.addData("Wait for start", "");
         telemetry.update();
+
+        robot.control.restLauncherFeeder();
+        robot.control.openIntakeToElevator();
+        robot.control.moveElevatorToBottom();
     }
 
     @Override
     public void runOpMode() throws InterruptedException{
+        initOpMode();
 
+        Thread intakeToElevatorThread = new IntakeToElevatorThread(this, robot);
+        Thread launcherFeederThread = new LauncherFeederThread(this, robot);
+        int stage = 0;
 
-        try {
-            initOpMode();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         waitForStart();
+
+        intakeToElevatorThread.start();
+        launcherFeederThread.start();
+
+        // Set all Expansion hubs to use the AUTO Bulk Caching mode
+        for (LynxModule module : robot.allHubs) {
+            module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+        }
 
         long startTime = timer.nanoseconds();
         telemetry.addLine("here1");
@@ -98,6 +117,19 @@ public class MotorTest extends LinearOpMode {
                 velocity = newVelocity;
             }
 
+            //Move elevator
+            if(robot.dPadUp && !robot.isdPadUpPressedPrev && (robot.control.getElevatorStage() != 0)){
+                robot.control.moveElevator(1);
+                stage++;
+            }
+
+            if(robot.dPadDown && !robot.isdPadDownPressedPrev){
+                robot.control.moveElevator(-1);
+                stage--;
+            }
+
+
+            telemetry.addData("elevator: ", stage );
             telemetry.addData("power: ", power);
             telemetry.addData("set  V: ", robot.control.tickPerSecTORPM(velocity));
             telemetry.addData("L1   V: ", robot.control.tickPerSecTORPM(robot.launch1.getVelocity()));
@@ -116,6 +148,8 @@ public class MotorTest extends LinearOpMode {
             Log.d("launcherEnc", output);
         }
 
+        intakeToElevatorThread.interrupt();
+        launcherFeederThread.interrupt();
 
         // park robot
     }
