@@ -121,6 +121,7 @@ public class Auto_Blue extends LinearOpMode {
         // launch rings
         launchRings();
 
+        stopLauncher();
 
         if(numRings.equals("ZERO")) {
             robot.drive.moveForward((70.75-launchPos)*mmPerInch);
@@ -165,6 +166,11 @@ public class Auto_Blue extends LinearOpMode {
     private void startLauncher() {
         // start launcher
         robot.control.setLaunchVelocity(-800.0); //722
+    }
+
+    private void stopLauncher() {
+        // start launcher
+        robot.control.setLaunchVelocity(0.0);
     }
 
     private void launchRings() throws InterruptedException {

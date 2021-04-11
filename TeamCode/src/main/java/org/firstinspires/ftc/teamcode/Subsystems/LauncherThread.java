@@ -29,12 +29,23 @@ public class LauncherThread extends Thread{
     private boolean odLACurrent = false;
     private boolean odLBCurrent = false;
 
+    private static final int ENCODER_DATA_DEPTH = 15;
+    private double[] sampleTimePoint;
+    private int[] sampleEncoderValue;
+    private int sampleDataIndex;
+    private boolean isLauncherStarted;
+
 
     public LauncherThread(OpMode opMode, Robot robot) {
         this.setName("LauncherThread");
         this.robot = robot;
+        this.timer = robot.timer;
         opMode.telemetry.addData("Started: ", this.getName());
         opMode.telemetry.update();
+        sampleTimePoint = new double[ENCODER_DATA_DEPTH];
+        sampleEncoderValue = new int[ENCODER_DATA_DEPTH];
+        sampleDataIndex = 0;
+        isLauncherStarted = false;
     }
 
     // called when tread.start is called. thread stays in loop to do what it does until exit is
@@ -52,8 +63,8 @@ public class LauncherThread extends Thread{
 
         // Set all Expansion hubs to use the AUTO Bulk Caching mode
         for (LynxModule module : robot.allHubs) {
-//            module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
-            module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+            module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+//            module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
 
         try {
@@ -147,5 +158,9 @@ public class LauncherThread extends Thread{
         }
 
 //            Logging.log("end of thread %s", this.getName());
+    }
+
+    private void updateLauncherRPM() {
+
     }
 }
