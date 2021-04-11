@@ -33,7 +33,10 @@ public class LauncherThread extends Thread{
     private double[] sampleTimePoint;
     private int[] sampleEncoderValue;
     private int sampleDataIndex;
+    private int sampleDataStartIndex;
     private boolean isLauncherStarted;
+    private boolean isLauncherRPMReliable;
+    private double launcherRPM;
 
 
     public LauncherThread(OpMode opMode, Robot robot) {
@@ -45,7 +48,10 @@ public class LauncherThread extends Thread{
         sampleTimePoint = new double[ENCODER_DATA_DEPTH];
         sampleEncoderValue = new int[ENCODER_DATA_DEPTH];
         sampleDataIndex = 0;
+        sampleDataStartIndex = 0;
         isLauncherStarted = false;
+        isLauncherRPMReliable = false;
+        launcherRPM = 0.0;
     }
 
     // called when tread.start is called. thread stays in loop to do what it does until exit is
@@ -161,6 +167,28 @@ public class LauncherThread extends Thread{
     }
 
     private void updateLauncherRPM() {
+        int currentCount = -robot.launch2a.getCurrentPosition();
+        double currentTime = ((double) timer.nanoseconds()) * 1.0e-6;
+
+        if (isLauncherStarted) {
+            if (isLauncherRPMReliable) {
+                // stable operation
+
+            }
+            else {
+
+            }
+        }
+        else {
+            // first time updating RPM
+            isLauncherStarted = true;
+            isLauncherRPMReliable = false;
+            sampleDataStartIndex = sampleDataIndex;
+            sampleTimePoint[sampleDataIndex] = currentTime;
+            sampleEncoderValue[sampleDataIndex] = currentCount;
+            sampleDataIndex = sampleDataIndex + 1;
+            launcherRPM = 0.0;
+        }
 
     }
 }
