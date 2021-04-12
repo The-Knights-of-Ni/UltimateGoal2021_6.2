@@ -15,19 +15,6 @@ public class LauncherThread extends Thread{
     private Robot robot;
     private OpMode opMode;
     private ElapsedTime timer;
-    private boolean isLauncherFeeder = false;
-    private boolean odRAPrev = false;
-    private boolean odRBPrev = false;
-    private boolean odRACurrent = false;
-    private boolean odRBCurrent = false;
-    private boolean odBAPrev = false;
-    private boolean odBBPrev = false;
-    private boolean odBACurrent = false;
-    private boolean odBBCurrent = false;
-    private boolean odLAPrev = false;
-    private boolean odLBPrev = false;
-    private boolean odLACurrent = false;
-    private boolean odLBCurrent = false;
 
     private static final int ENCODER_DATA_DEPTH = 15;
     private double[] sampleTimePoint;
@@ -37,6 +24,7 @@ public class LauncherThread extends Thread{
     private boolean isLauncherStarted;
     private boolean isLauncherRPMReliable;
     private double launcherRPM;
+    private static final double LAUNCHER_MAX_RPM = 6000.0;
 
 
     public LauncherThread(OpMode opMode, Robot robot) {
@@ -59,6 +47,19 @@ public class LauncherThread extends Thread{
     public void run() {
         int evenValue = 0;
 
+        boolean initialized = false;
+        double currentTime;
+        double prevTime = 0.0;
+        double targetRPM;
+        double Kp, Ki, Kd;
+        double currentError;
+        double alpha = 0.95;
+        double acculError = 0.0;
+        double prevError = 0.0;
+        double errorSlope;
+        double currentPower;
+
+
         // Get access to a list of Expansion Hub Modules to enable changing caching methods.
 //        List<LynxModule> allHubs = opMode.hardwareMap.getAll(LynxModule.class);
 
@@ -72,85 +73,40 @@ public class LauncherThread extends Thread{
             module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
 //            module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
-
         try {
 
-            odRAPrev = robot.odometryRA.getState();
-            odRBPrev = robot.odometryRB.getState();
-            odBAPrev = robot.odometryBA.getState();
-            odBBPrev = robot.odometryBB.getState();
-            odLAPrev = robot.odometryLA.getState();
-            odLBPrev = robot.odometryLB.getState();
             while (!isInterrupted()) {
                 // Important Step 4: If you are using MANUAL mode, you must clear the BulkCache once per control cycle
-                for (LynxModule module : robot.allHubs) {
-                    module.clearBulkCache();
-                }
+//                for (LynxModule module : robot.allHubs) {
+//                    module.clearBulkCache();
+//                }
 
-                odRACurrent = robot.odometryRA.getState();
-                odRBCurrent = robot.odometryRB.getState();
-                odBACurrent = robot.odometryBA.getState();
-                odBBCurrent = robot.odometryBB.getState();
-                odLACurrent = robot.odometryLA.getState();
-                odLBCurrent = robot.odometryLB.getState();
+                currentTime = updateLauncherRPM();
 
-                // quadrature decoding
-                if(odRACurrent != odRAPrev){
-                    if(odRACurrent != odRBCurrent){
-                        robot.odRCount ++;
-                    }
-                    else{
-                        robot.odRCount --;
-                    }
+                targetRPM = robot.control.getLauncherTargetRPM();
 
+                Kp = robot.control.getLauncherKp();
+                Ki = robot.control.getLauncherKi();
+                Kd = robot.control.getLauncherKd();
+
+                currentError = launcherRPM - targetRPM;
+                if (initialized) { // after the first point, the previous data is valid
+                    acculError = acculError*alpha + currentError*(currentTime-prevTime);  // integrate error
+                    errorSlope = (currentError - prevError)/(currentTime-prevTime);         // error slope
+                    currentPower = launcherRPM/LAUNCHER_MAX_RPM - currentError*Kp - acculError*Ki - errorSlope*Kd; // apply PID correction
                 }
-                if(odRBCurrent != odRBPrev){
-                    if(odRBCurrent == odRACurrent){
-                        robot.odRCount ++;
-                    }
-                    else{
-                        robot.odRCount --;
-                    }
+                else { // at the first point, use Kp only
+                    currentPower = launcherRPM/LAUNCHER_MAX_RPM - currentError*Kp;
                 }
-                if(odBACurrent && (odBACurrent != odBAPrev)){
-                    if(odBACurrent != odBBCurrent){
-                        robot.odBCount ++;
-                    }
-                    else{
-                        robot.odBCount --;
-                    }
-                }
-                if(odBBCurrent != odBBPrev){
-                    if(odBBCurrent == odBACurrent){
-                        robot.odBCount ++;
-                    }
-                    else{
-                        robot.odBCount --;
-                    }
-                }
-                if(odLACurrent != odLAPrev){
-                    robot.odLCount ++;
-                    if(odLACurrent != odLBCurrent){
-                        robot.odLCount ++;
-                    }
-                    else{
-                        robot.odLCount --;
-                    }
-                }
-                if(odLBCurrent != odLBPrev){
-                    if(odLBCurrent == odLACurrent){
-                        robot.odLCount ++;
-                    }
-                    else{
-                        robot.odLCount --;
-                    }
-                }
-                odRAPrev = odRACurrent;
-                odRBPrev = odRBCurrent;
-                odBAPrev = odBACurrent;
-                odBBPrev = odBBCurrent;
-                odLAPrev = odLACurrent;
-                odLBPrev = odLBCurrent;
+                if (currentPower > 1.0) currentPower = 1.0;
+                if (currentPower < 0.0) currentPower = 0.0;
+                robot.launch1.setPower(currentPower);
+                robot.launch2a.setPower(currentPower);
+                robot.launch2b.setPower(currentPower);
+
+                prevError = currentError;
+                prevTime = currentTime;
+                sleep(5);
 
             }
 
@@ -166,17 +122,20 @@ public class LauncherThread extends Thread{
 //            Logging.log("end of thread %s", this.getName());
     }
 
-    private void updateLauncherRPM() {
+    private double updateLauncherRPM() {
         int currentCount = -robot.launch2a.getCurrentPosition();
-        double currentTime = ((double) timer.nanoseconds()) * 1.0e-6;
+        double currentTime = ((double) timer.nanoseconds()) * 1.0e-6;       // currentTime is in msec
 
         if (isLauncherStarted) {
             if (isLauncherRPMReliable) {
                 // stable operation
-
+                launcherRPM = (currentCount - sampleEncoderValue[sampleDataIndex])*60000.0/(28*(currentTime - sampleTimePoint[sampleDataIndex]));
             }
             else {
-
+                // still filling up data queue
+                launcherRPM = (currentCount - sampleEncoderValue[sampleDataStartIndex])*60000.0/(28*(currentTime - sampleTimePoint[sampleDataStartIndex]));
+                if (sampleDataStartIndex == sampleDataIndex)
+                    isLauncherRPMReliable = true;
             }
         }
         else {
@@ -184,11 +143,15 @@ public class LauncherThread extends Thread{
             isLauncherStarted = true;
             isLauncherRPMReliable = false;
             sampleDataStartIndex = sampleDataIndex;
-            sampleTimePoint[sampleDataIndex] = currentTime;
-            sampleEncoderValue[sampleDataIndex] = currentCount;
-            sampleDataIndex = sampleDataIndex + 1;
             launcherRPM = 0.0;
         }
+        sampleTimePoint[sampleDataIndex] = currentTime;
+        sampleEncoderValue[sampleDataIndex] = currentCount;
+        sampleDataIndex = sampleDataIndex + 1;
+        if (sampleDataIndex == ENCODER_DATA_DEPTH)
+            sampleDataIndex = 0;
 
+        robot.control.setLauncherCurrentRPM(launcherRPM);
+        return currentTime;
     }
 }

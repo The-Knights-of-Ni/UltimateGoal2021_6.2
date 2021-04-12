@@ -167,6 +167,11 @@ Control extends Subsystem {
      * 3 = 1 Ring position
      */
 
+    private double launcherCurrentRPM;
+    private double launcherTargetRPM;
+    private double launcherKp;
+    private double launcherKi;
+    private double launcherKd;
 
 
 //    public Control(DcMotorEx intake, DcMotorEx launch1, DcMotorEx launch2, BNO055IMU imu, LinearOpMode opMode, ElapsedTime timer, ) {
@@ -371,6 +376,28 @@ Control extends Subsystem {
         launch2a.setVelocity(angularRate);
         launch2b.setVelocity(angularRate);
     }
+
+    public void setLauncherCurrentRPM(double launcherRPM) { launcherCurrentRPM = launcherRPM; }
+
+    public double getLauncherCurrentRPM() { return launcherCurrentRPM; }
+
+    public void setLauncherTargetRPM(double launcherRPM) {
+        launcherTargetRPM = launcherRPM;
+    }
+
+    public double getLauncherTargetRPM() { return launcherTargetRPM; }
+
+    public void setLauncherKp(double kp) { launcherKp = kp; }
+
+    public double getLauncherKp() { return launcherKp; }
+
+    public void setLauncherKi(double ki) { launcherKi = ki; }
+
+    public double getLauncherKi() { return launcherKi; }
+
+    public void setLauncherKd(double kd) { launcherKd = kd; }
+
+    public double getLauncherKd() { return launcherKd; }
 
     public int getElevatorStage(){
         return elevatorStage;

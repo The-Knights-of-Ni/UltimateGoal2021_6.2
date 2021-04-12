@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Subsystems.IntakeToElevatorThread;
 import org.firstinspires.ftc.teamcode.Subsystems.LauncherFeederThread;
+import org.firstinspires.ftc.teamcode.Subsystems.LauncherThread;
 import org.firstinspires.ftc.teamcode.Subsystems.Robot;
 import org.firstinspires.ftc.teamcode.Subsystems.WobbleGoalArmTeleopThread;
 
@@ -16,6 +17,7 @@ import java.io.IOException;
 
 /**
  * Created by Ryan on 1/10/2021.
+ * modified by Andrew Chiang on 3/24/2021
  */
 
 @TeleOp(name = "Motor Test")
@@ -28,12 +30,16 @@ public class MotorTest extends LinearOpMode {
     double incrementVelocity = 20.0;
     double velocity = 722.0; // ticks/sec
     double newVelocity = velocity;
-
-
+    double targetRPM = 1540.0;
+    double incrementRPM = 20.0;
+    double Kp = 0.005;
+    double Ki = 0.0;
+    double Kd = 0.0;
 
     private static final float mmPerInch        = 25.4f;
     private static final float mmTargetHeight   = (6) * mmPerInch;          // the height of the center of the target image above the floor
     private static final double     LAUNCHER_ANG_PER_SEC_LIMIT = 722.0*2.0;
+    private static final double     LAUNCHER_RPM_LIMIT = 3000.0;
 
     private void initOpMode() {
         telemetry.addData("Init Robot", "");
@@ -60,12 +66,19 @@ public class MotorTest extends LinearOpMode {
 
         Thread intakeToElevatorThread = new IntakeToElevatorThread(this, robot);
         Thread launcherFeederThread = new LauncherFeederThread(this, robot);
-        int stage = 0;
+        Thread launcherThread = new LauncherThread(this, robot);
+
+        robot.control.setLauncherTargetRPM(0.0);
+        robot.control.setLauncherKp(Kp);
+        robot.control.setLauncherKi(Ki);
+        robot.control.setLauncherKd(Kd);
+        robot.control.setLauncherTargetRPM(targetRPM);
 
         waitForStart();
 
         intakeToElevatorThread.start();
         launcherFeederThread.start();
+        launcherThread.start();
 
         // Set all Expansion hubs to use the AUTO Bulk Caching mode
         for (LynxModule module : robot.allHubs) {
@@ -77,8 +90,8 @@ public class MotorTest extends LinearOpMode {
         telemetry.update();
         sleep(100);
 
-        robot.control.setLaunchPower(power);
-        robot.control.setLaunchVelocity(-velocity);
+//        robot.control.setLaunchPower(power);
+//        robot.control.setLaunchVelocity(-velocity);
 
         while(opModeIsActive()) {
             robot.getGamePadInputs();
@@ -107,6 +120,11 @@ public class MotorTest extends LinearOpMode {
                 robot.control.setLaunchVelocity(-newVelocity);
                 velocity = newVelocity;
 
+                targetRPM = targetRPM + incrementRPM;
+                if (targetRPM > LAUNCHER_RPM_LIMIT) {
+                    targetRPM = LAUNCHER_RPM_LIMIT;
+                }
+                robot.control.setLauncherTargetRPM(targetRPM);
             }
             if(robot.aButton && !robot.isaButtonPressedPrev){
                 newVelocity = velocity - incrementVelocity;
@@ -115,22 +133,25 @@ public class MotorTest extends LinearOpMode {
                 }
                 robot.control.setLaunchVelocity(-newVelocity);
                 velocity = newVelocity;
+
+                targetRPM = targetRPM - incrementRPM;
+                if (targetRPM < 0.0) {
+                    targetRPM = 0.0;
+                }
+                robot.control.setLauncherTargetRPM(targetRPM);
             }
 
             //Move elevator
             if(robot.dPadUp && !robot.isdPadUpPressedPrev && (robot.control.getElevatorStage() != 0)){
                 robot.control.moveElevator(1);
-                stage++;
             }
 
             if(robot.dPadDown && !robot.isdPadDownPressedPrev){
                 robot.control.moveElevator(-1);
-                stage--;
             }
 
 
-            telemetry.addData("elevator: ", stage );
-            telemetry.addData("power: ", power);
+            telemetry.addData("power: ", robot.launch2a.getPower());
             telemetry.addData("set  V: ", robot.control.tickPerSecTORPM(velocity));
             telemetry.addData("L1   V: ", robot.control.tickPerSecTORPM(robot.launch1.getVelocity()));
             telemetry.addData("L2a  V: ", robot.control.tickPerSecTORPM(robot.launch2a.getVelocity()));
@@ -150,6 +171,7 @@ public class MotorTest extends LinearOpMode {
 
         intakeToElevatorThread.interrupt();
         launcherFeederThread.interrupt();
+        launcherThread.interrupt();
 
         // park robot
     }

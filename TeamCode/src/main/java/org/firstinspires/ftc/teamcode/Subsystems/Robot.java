@@ -202,21 +202,24 @@ public class Robot extends Subsystem {
         launch1.setDirection(DcMotorSimple.Direction.REVERSE);
         launch1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         launch1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        launch1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        launch1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        launch1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         launch1.setPower(0.0);
 
         launch2a = (DcMotorEx) hardwareMap.dcMotor.get("launch2a");
         launch2a.setDirection(DcMotorSimple.Direction.REVERSE);
         launch2a.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         launch2a.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        launch2a.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        launch2a.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        launch2a.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         launch2a.setPower(0.0);
 
         launch2b = (DcMotorEx) hardwareMap.dcMotor.get("launch2b");
         launch2b.setDirection(DcMotorSimple.Direction.REVERSE);
         launch2b.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         launch2b.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        launch2b.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        launch2b.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        launch2b.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         launch2b.setPower(0.0);
 
         intake = (DcMotorEx) hardwareMap.dcMotor.get("intake");
