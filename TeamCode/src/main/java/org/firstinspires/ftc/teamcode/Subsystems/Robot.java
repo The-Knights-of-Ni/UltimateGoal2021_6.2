@@ -193,41 +193,41 @@ public class Robot extends Subsystem {
         frontLeftDriveMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         rearLeftDriveMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        frontLeftDriveMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontRightDriveMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rearLeftDriveMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rearRightDriveMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontLeftDriveMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        frontRightDriveMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        rearLeftDriveMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        rearRightDriveMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         launch1 = (DcMotorEx) hardwareMap.dcMotor.get("launch1");
         launch1.setDirection(DcMotorSimple.Direction.REVERSE);
-        launch1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        launch1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        launch1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//        launch1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        launch1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        launch1.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        launch1.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+//        launch1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         launch1.setPower(0.0);
 
         launch2a = (DcMotorEx) hardwareMap.dcMotor.get("launch2a");
         launch2a.setDirection(DcMotorSimple.Direction.REVERSE);
-        launch2a.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        launch2a.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        launch2a.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//        launch2a.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        launch2a.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        launch2a.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        launch2a.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+//        launch2a.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         launch2a.setPower(0.0);
 
         launch2b = (DcMotorEx) hardwareMap.dcMotor.get("launch2b");
         launch2b.setDirection(DcMotorSimple.Direction.REVERSE);
-        launch2b.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        launch2b.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        launch2b.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//        launch2b.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        launch2b.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        launch2b.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        launch2b.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+//        launch2b.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         launch2b.setPower(0.0);
 
         intake = (DcMotorEx) hardwareMap.dcMotor.get("intake");
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
-        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//        intake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intake.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        intake.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        intake.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+//        intake.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         intake.setPower(0.0);
 
         //Servos
@@ -250,19 +250,19 @@ public class Robot extends Subsystem {
 
         allHubs = hardwareMap.getAll(LynxModule.class);
 
-        odometryRA  = hardwareMap.get(DigitalChannel.class, "odra");
-        odometryRB = hardwareMap.get(DigitalChannel.class, "odrb");
-        odometryBA  = hardwareMap.get(DigitalChannel.class, "odba");
-        odometryBB = hardwareMap.get(DigitalChannel.class, "odbb");
-        odometryLA  = hardwareMap.get(DigitalChannel.class, "odla");
-        odometryLB = hardwareMap.get(DigitalChannel.class, "odlb");
-
-        odometryRA.setMode(DigitalChannel.Mode.INPUT);          // Set the direction of each channel
-        odometryRB.setMode(DigitalChannel.Mode.INPUT);
-        odometryBA.setMode(DigitalChannel.Mode.INPUT);          // Set the direction of each channel
-        odometryBB.setMode(DigitalChannel.Mode.INPUT);
-        odometryLA.setMode(DigitalChannel.Mode.INPUT);          // Set the direction of each channel
-        odometryLB.setMode(DigitalChannel.Mode.INPUT);
+//        odometryRA  = hardwareMap.get(DigitalChannel.class, "odra");
+//        odometryRB = hardwareMap.get(DigitalChannel.class, "odrb");
+//        odometryBA  = hardwareMap.get(DigitalChannel.class, "odba");
+//        odometryBB = hardwareMap.get(DigitalChannel.class, "odbb");
+//        odometryLA  = hardwareMap.get(DigitalChannel.class, "odla");
+//        odometryLB = hardwareMap.get(DigitalChannel.class, "odlb");
+//
+//        odometryRA.setMode(DigitalChannel.Mode.INPUT);          // Set the direction of each channel
+//        odometryRB.setMode(DigitalChannel.Mode.INPUT);
+//        odometryBA.setMode(DigitalChannel.Mode.INPUT);          // Set the direction of each channel
+//        odometryBB.setMode(DigitalChannel.Mode.INPUT);
+//        odometryLA.setMode(DigitalChannel.Mode.INPUT);          // Set the direction of each channel
+//        odometryLB.setMode(DigitalChannel.Mode.INPUT);
 
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");

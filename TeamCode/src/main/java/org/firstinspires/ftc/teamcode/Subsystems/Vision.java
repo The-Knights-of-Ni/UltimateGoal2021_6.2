@@ -23,6 +23,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.
 
 /**
  * Created by Ryan Lin on 1/04/2021.
+ * modified by Andrew Chiang on 4/14/2021
  */
 
 /**
@@ -48,6 +49,7 @@ public class Vision {
 
     private static final boolean USING_WEBCAM = true; // change to true if using webcam
     private static final String WEBCAM_NAME = "Webcam 1"; // insert webcam name from configuration if using webcam
+    private static final String WEBCAM_NAME2 = "Webcam 2"; // insert webcam name from configuration if using webcam
     WebcamName webcamName = null;
 
     private static final String VUFORIA_KEY =
@@ -58,10 +60,14 @@ public class Vision {
     private static final float mmPerInch        = 25.4f;
     private static final float mmTargetHeight   = (6) * mmPerInch;
 
+    // Constants for perimeter targets
+    private static final float halfField = 72 * mmPerInch;
+    private static final float quadField  = 36 * mmPerInch;
+
     // Define where camera is in relation to center of robot in inches
-    final float CAMERA_FORWARD_DISPLACEMENT  = 0 * mmPerInch;
-    final float CAMERA_VERTICAL_DISPLACEMENT = 0 * mmPerInch;
-    final float CAMERA_LEFT_DISPLACEMENT     = 0 * mmPerInch;
+    final float CAMERA_FORWARD_DISPLACEMENT  = 6.0f * mmPerInch;
+    final float CAMERA_VERTICAL_DISPLACEMENT = 6.5f * mmPerInch;
+    final float CAMERA_LEFT_DISPLACEMENT     = -0.75f * mmPerInch;
 
     // Class Members
     private OpenGLMatrix lastLocation = null;
@@ -69,11 +75,17 @@ public class Vision {
     private VuforiaLocalizer vuforia = null;
 
     private boolean targetVisible = false;
+    private VectorF targetTranslation;
+    private Orientation targetRotation;
+
     private VuforiaTrackables targetsUltimateGoal;
-    private VuforiaTrackable target;
+    private VuforiaTrackable towerTarget;
+    private VuforiaTrackable frontWallTarget;
 
     private UGContourRingPipeline pipeline;
     private OpenCvCamera camera;
+
+    private int[] viewportContainerIds;
 
     public Vision(HardwareMap hardwareMap, Robot robot, boolean isBlue) {
         this.hardwareMap = hardwareMap;
@@ -83,15 +95,34 @@ public class Vision {
         } else {
             alliance = Color.RED;
         }
-        //initVuforia();
+
+        webcamName = hardwareMap.get(WebcamName.class, WEBCAM_NAME);
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        /**
+         * This is the only thing you need to do differently when using multiple cameras.
+         * Instead of obtaining the camera monitor view and directly passing that to the
+         * camera constructor, we invoke {@link OpenCvCameraFactory#splitLayoutForMultipleViewports(int, int)}
+         * on that view in order to split that view into multiple equal-sized child views,
+         * and then pass those child views to the constructor.
+         */
+        viewportContainerIds = OpenCvCameraFactory.getInstance().splitLayoutForMultipleViewports(cameraMonitorViewId, 2, OpenCvCameraFactory.ViewportSplitMethod.HORIZONTALLY);
+
+
+        robot.getOpmode().telemetry.addLine("init Vuforia");
+        robot.getOpmode().telemetry.update();
+        initVuforia();
+
+        robot.getOpmode().telemetry.addLine("init RingPipeline");
+        robot.getOpmode().telemetry.update();
         initRingPipeline();
+
+        robot.getOpmode().telemetry.addLine("vision init completed");
+        robot.getOpmode().telemetry.update();
     }
 
     private void initVuforia() {
         // Configure parameters
-        webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(viewportContainerIds[1]);
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
         parameters.cameraName = webcamName;
         parameters.useExtendedTracking = false;
@@ -102,37 +133,36 @@ public class Vision {
         // Load the data sets for the trackable objects. These particular data sets are stored in the 'assets' part of our application.
         targetsUltimateGoal = this.vuforia.loadTrackablesFromAsset("UltimateGoal");
         if(alliance == Color.BLUE) {
-            target = targetsUltimateGoal.get(0);
-            target.setName("Blue Tower Goal Target");
+            towerTarget = targetsUltimateGoal.get(0);
+            towerTarget.setName("Blue Tower Goal Target");
         } else {
-            target = targetsUltimateGoal.get(1);
-            target.setName("Red Tower Goal Target");
+            towerTarget = targetsUltimateGoal.get(1);
+            towerTarget.setName("Red Tower Goal Target");
         }
+        frontWallTarget = targetsUltimateGoal.get(4);
+        frontWallTarget.setName("Front Wall Target");
 
-        // Set the position of the perimeter targets with relation to origin in millimeters (in our case, this is the "sweet spot")
-        target.setLocation(createMatrix(0, 500, mmTargetHeight, 90, 0, 0));
-
-        // Define where camera is in relation to center of robot in inches
-        final float CAMERA_FORWARD_DISPLACEMENT  = 0 * mmPerInch;
-        final float CAMERA_VERTICAL_DISPLACEMENT = 0 * mmPerInch;
-        final float CAMERA_LEFT_DISPLACEMENT     = 0 * mmPerInch;
+        // Set the position of the perimeter target as the origin (robot position will be relative to the target)
+        towerTarget.setLocation(createMatrix(0, 0, mmTargetHeight, 90, 0, 0));
+        frontWallTarget.setLocation(createMatrix(0, 0, mmTargetHeight, 90, 0, 0));
 
         OpenGLMatrix robotFromCamera = createMatrix(CAMERA_LEFT_DISPLACEMENT, CAMERA_FORWARD_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT, 90, 0, 0);
 
-        ((VuforiaTrackableDefaultListener) target.getListener()).setPhoneInformation(robotFromCamera, parameters.cameraDirection);
+        ((VuforiaTrackableDefaultListener) towerTarget.getListener()).setPhoneInformation(robotFromCamera, parameters.cameraDirection);
+        ((VuforiaTrackableDefaultListener) frontWallTarget.getListener()).setPhoneInformation(robotFromCamera, parameters.cameraDirection);
     }
 
-    public void vuMarkScan() {
-        // check all the trackable targets to see which one (if any) is visible.
+    public boolean towerTargetScan() {
+        // check the tower target to see if it is visible.
         targetsUltimateGoal.activate();
         targetVisible = false;
-        if (((VuforiaTrackableDefaultListener)target.getListener()).isVisible()) {
-            robot.getOpmode().telemetry.addData("Visible Target", target.getName());
+        if (((VuforiaTrackableDefaultListener) towerTarget.getListener()).isVisible()) {
+            robot.getOpmode().telemetry.addData("Visible Target", towerTarget.getName());
             targetVisible = true;
 
             // getUpdatedRobotLocation() will return null if no new information is available since
             // the last time that call was made, or if the trackable is not currently visible.
-            OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener)target.getListener()).getUpdatedRobotLocation();
+            OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener) towerTarget.getListener()).getUpdatedRobotLocation();
             if (robotLocationTransform != null) {
                 lastLocation = robotLocationTransform;
             }
@@ -140,40 +170,41 @@ public class Vision {
 
         // Provide feedback as to where the robot is located (if we know).
         if (targetVisible) {
-            // express position (translation) of robot in inches.
-            VectorF translation = lastLocation.getTranslation();
-            robot.getOpmode().telemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
-                    translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
+            // express position (translation) of robot in mm.
+            targetTranslation = lastLocation.getTranslation();
+            robot.getOpmode().telemetry.addData("Pos (mm)", "{X, Y, Z} = %.1f, %.1f, %.1f",
+                    targetTranslation.get(0), targetTranslation.get(1), targetTranslation.get(2));
 
             // express the rotation of the robot in degrees.
-            Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
-            robot.getOpmode().telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
+            targetRotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
+            robot.getOpmode().telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", targetRotation.firstAngle, targetRotation.secondAngle, targetRotation.thirdAngle);
         }
         else {
             robot.getOpmode().telemetry.addData("Visible Target", "none");
         }
         robot.getOpmode().telemetry.update();
+        return targetVisible;
     }
 
     private void initRingPipeline() {
         // get camera from the robot
-        int cameraMonitorViewId = this
-                .hardwareMap
-                .appContext
-                .getResources().getIdentifier(
-                        "cameraMonitorViewId",
-                        "id",
-                        hardwareMap.appContext.getPackageName()
-                );
-        if (USING_WEBCAM) {
+//        int cameraMonitorViewId = this
+//                .hardwareMap
+//                .appContext
+//                .getResources().getIdentifier(
+//                        "cameraMonitorViewId",
+//                        "id",
+//                        hardwareMap.appContext.getPackageName()
+//                );
+//        if (USING_WEBCAM) {
             camera = OpenCvCameraFactory
                     .getInstance()
-                    .createWebcam(hardwareMap.get(WebcamName.class, WEBCAM_NAME), cameraMonitorViewId);
-        } else {
-            camera = OpenCvCameraFactory
-                    .getInstance()
-                    .createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
-        }
+                    .createWebcam(hardwareMap.get(WebcamName.class, WEBCAM_NAME2), viewportContainerIds[0]);
+//        } else {
+//            camera = OpenCvCameraFactory
+//                    .getInstance()
+//                    .createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
+//        }
 
         UGContourRingPipeline.Config.setCAMERA_WIDTH(CAMERA_WIDTH);
         UGContourRingPipeline.Config.setHORIZON(HORIZON);

@@ -72,6 +72,8 @@ public class VisionTest extends LinearOpMode {
 
 //        mainClawRotationAngle = robot.control.getMainClawRotationDegrees();
         telemetry.clearAll();
+        telemetry.addLine("vision test");
+        telemetry.update();
 
         timeCurrent = timer.nanoseconds();
         timePre = timeCurrent;
@@ -93,7 +95,7 @@ public class VisionTest extends LinearOpMode {
             deltaT = timeCurrent - timePre;
             timePre = timeCurrent;
 
-//            robot.vision.vuMarkScan();
+            robot.vision.towerTargetScan();
 //
 //            // robot control
             // Get gamepad inputs

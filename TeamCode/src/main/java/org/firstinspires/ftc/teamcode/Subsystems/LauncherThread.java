@@ -24,7 +24,7 @@ public class LauncherThread extends Thread{
     private boolean isLauncherStarted;
     private boolean isLauncherRPMReliable;
     private double launcherRPM;
-    private static final double LAUNCHER_MAX_RPM = 6000.0;
+    private static final double LAUNCHER_MAX_RPM = 1800.0;
 
 
     public LauncherThread(OpMode opMode, Robot robot) {
@@ -53,7 +53,7 @@ public class LauncherThread extends Thread{
         double targetRPM;
         double Kp, Ki, Kd;
         double currentError;
-        double alpha = 0.95;
+        double alpha = 0.99;
         double acculError = 0.0;
         double prevError = 0.0;
         double errorSlope;
@@ -100,9 +100,9 @@ public class LauncherThread extends Thread{
                 }
                 if (currentPower > 1.0) currentPower = 1.0;
                 if (currentPower < 0.0) currentPower = 0.0;
-                robot.launch1.setPower(currentPower);
-                robot.launch2a.setPower(currentPower);
-                robot.launch2b.setPower(currentPower);
+                robot.launch1.setPower(-currentPower*0.7);
+                robot.launch2a.setPower(-currentPower);
+                robot.launch2b.setPower(-currentPower);
 
                 prevError = currentError;
                 prevTime = currentTime;

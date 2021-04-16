@@ -5,6 +5,9 @@ import android.util.Log;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Subsystems.IntakeToElevatorThread;
@@ -30,16 +33,19 @@ public class MotorTest extends LinearOpMode {
     double incrementVelocity = 20.0;
     double velocity = 722.0; // ticks/sec
     double newVelocity = velocity;
-    double targetRPM = 1540.0;
+    double targetRPM = 1460.0;
     double incrementRPM = 20.0;
+    double incrementKp = 0.0002;
+    double incrementKi = 0.00001;
+    double incrementKd = 0.0002;
     double Kp = 0.005;
-    double Ki = 0.0;
-    double Kd = 0.0;
+    double Ki = 0.001;
+    double Kd = 0.002;
 
     private static final float mmPerInch        = 25.4f;
     private static final float mmTargetHeight   = (6) * mmPerInch;          // the height of the center of the target image above the floor
     private static final double     LAUNCHER_ANG_PER_SEC_LIMIT = 722.0*2.0;
-    private static final double     LAUNCHER_RPM_LIMIT = 3000.0;
+    private static final double     LAUNCHER_RPM_LIMIT = 1800.0;
 
     private void initOpMode() {
         telemetry.addData("Init Robot", "");
@@ -74,6 +80,16 @@ public class MotorTest extends LinearOpMode {
         robot.control.setLauncherKd(Kd);
         robot.control.setLauncherTargetRPM(targetRPM);
 
+        // list REV internal PID coefficients
+//        PIDFCoefficients revPIDFCoeficients = robot.launch2a.getPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER);
+//        telemetry.addData("REV PIDF Kp: ", revPIDFCoeficients.p);       // Kp = 10.0
+//        telemetry.addData("REV PIDF Ki: ", revPIDFCoeficients.i);       // Ki = 3.0
+//        telemetry.addData("REV PIDF Kd: ", revPIDFCoeficients.d);       // Kd = 0.0
+//        telemetry.addData("REV PIDF Kf: ", revPIDFCoeficients.f);       // Kf = 0.0
+        telemetry.addData("Wait for start", "");
+        telemetry.update();
+
+
         waitForStart();
 
         intakeToElevatorThread.start();
@@ -88,7 +104,7 @@ public class MotorTest extends LinearOpMode {
         long startTime = timer.nanoseconds();
         telemetry.addLine("here1");
         telemetry.update();
-        sleep(100);
+        sleep(10);
 
 //        robot.control.setLaunchPower(power);
 //        robot.control.setLaunchVelocity(-velocity);
@@ -97,28 +113,48 @@ public class MotorTest extends LinearOpMode {
             robot.getGamePadInputs();
 
             if(robot.yButton && !robot.isyButtonPressedPrev){
-                power = power + incrementPower;
-                if(power > 1.0){
-                    power = 1.0;
-                }
-                robot.control.setLaunchPower(power);
+//                power = power + incrementPower;
+//                if(power > 1.0){
+//                    power = 1.0;
+//                }
+//                robot.control.setLaunchPower(power);
 
+                Kp = Kp + incrementKp;
+                robot.control.setLauncherKp(Kp);
             }
             if(robot.xButton && !robot.isxButtonPressedPrev){
-                power = power - incrementPower;
-                if(power < 0.0){
-                    power = 0.0;
-                }
-                robot.control.setLaunchPower(power);
+//                power = power - incrementPower;
+//                if(power < 0.0){
+//                    power = 0.0;
+//                }
+//                robot.control.setLaunchPower(power);
 
+                Kp = Kp - incrementKp;
+                robot.control.setLauncherKp(Kp);
+            }
+            if(robot.yButton2 && !robot.isyButton2PressedPrev){
+                Ki = Ki + incrementKi;
+                robot.control.setLauncherKi(Ki);
+            }
+            if(robot.xButton2 && !robot.isxButton2PressedPrev){
+                Ki = Ki - incrementKi;
+                robot.control.setLauncherKi(Ki);
+            }
+            if(robot.bButton2 && !robot.isbButton2PressedPrev){
+                Kd = Kd + incrementKd;
+                robot.control.setLauncherKd(Kd);
+            }
+            if(robot.aButton2 && !robot.isaButton2PressedPrev){
+                Kd = Kd - incrementKd;
+                robot.control.setLauncherKd(Kd);
             }
             if(robot.bButton && !robot.isbButtonPressedPrev){
-                newVelocity = velocity + incrementVelocity;
-                if(newVelocity > LAUNCHER_ANG_PER_SEC_LIMIT){
-                    newVelocity = LAUNCHER_ANG_PER_SEC_LIMIT;
-                }
-                robot.control.setLaunchVelocity(-newVelocity);
-                velocity = newVelocity;
+//                newVelocity = velocity + incrementVelocity;
+//                if(newVelocity > LAUNCHER_ANG_PER_SEC_LIMIT){
+//                    newVelocity = LAUNCHER_ANG_PER_SEC_LIMIT;
+//                }
+//                robot.control.setLaunchVelocity(-newVelocity);
+//                velocity = newVelocity;
 
                 targetRPM = targetRPM + incrementRPM;
                 if (targetRPM > LAUNCHER_RPM_LIMIT) {
@@ -127,12 +163,12 @@ public class MotorTest extends LinearOpMode {
                 robot.control.setLauncherTargetRPM(targetRPM);
             }
             if(robot.aButton && !robot.isaButtonPressedPrev){
-                newVelocity = velocity - incrementVelocity;
-                if(newVelocity < 0.0){
-                    newVelocity = 0.0;
-                }
-                robot.control.setLaunchVelocity(-newVelocity);
-                velocity = newVelocity;
+//                newVelocity = velocity - incrementVelocity;
+//                if(newVelocity < 0.0){
+//                    newVelocity = 0.0;
+//                }
+//                robot.control.setLaunchVelocity(-newVelocity);
+//                velocity = newVelocity;
 
                 targetRPM = targetRPM - incrementRPM;
                 if (targetRPM < 0.0) {
@@ -152,20 +188,27 @@ public class MotorTest extends LinearOpMode {
 
 
             telemetry.addData("power: ", robot.launch2a.getPower());
-            telemetry.addData("set  V: ", robot.control.tickPerSecTORPM(velocity));
-            telemetry.addData("L1   V: ", robot.control.tickPerSecTORPM(robot.launch1.getVelocity()));
-            telemetry.addData("L2a  V: ", robot.control.tickPerSecTORPM(robot.launch2a.getVelocity()));
-            telemetry.addData("L2b  V: ", robot.control.tickPerSecTORPM(robot.launch2b.getVelocity()));
+            telemetry.addData("set     RPM: ", targetRPM);
+            telemetry.addData("current RPM: ", robot.control.getLauncherCurrentRPM());
+            telemetry.addData("Kp: ", Kp);
+            telemetry.addData("Ki: ", Ki);
+            telemetry.addData("Kd: ", Kd);
+//            telemetry.addData("set  V: ", robot.control.tickPerSecTORPM(velocity));
+//            telemetry.addData("L1   V: ", robot.control.tickPerSecTORPM(robot.launch1.getVelocity()));
+//            telemetry.addData("L2a  V: ", robot.control.tickPerSecTORPM(robot.launch2a.getVelocity()));
+//            telemetry.addData("L2b  V: ", robot.control.tickPerSecTORPM(robot.launch2b.getVelocity()));
 
-            telemetry.update();
+            robot.vision.towerTargetScan();
+
+//            telemetry.update();
 
             int currentCountL1 = -robot.launch1.getCurrentPosition();
-            double currentTimeFL = ((double) (timer.nanoseconds() - startTime)) * 1.0e-6;
+            double currentTime = ((double) (timer.nanoseconds() - startTime)) * 1.0e-6;
             int currentCountL2a = -robot.launch2a.getCurrentPosition();
             int currentCountL2b = -robot.launch2b.getCurrentPosition();
 
             String output = String.format("time %.3f launch1 %d launch2a %d launch2b %d",
-                    currentTimeFL, currentCountL1, currentCountL2a, currentCountL2b);
+                    currentTime, currentCountL1, currentCountL2a, currentCountL2b);
             Log.d("launcherEnc", output);
         }
 
