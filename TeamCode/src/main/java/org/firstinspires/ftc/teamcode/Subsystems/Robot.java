@@ -290,7 +290,7 @@ public class Robot extends Subsystem {
         //Subsystems
         opMode.telemetry.addData("Mode", " drive/control initializing...");
         opMode.telemetry.update();
-        drive = new Drive(frontLeftDriveMotor, frontRightDriveMotor, rearLeftDriveMotor, rearRightDriveMotor, imu, opMode, timer);
+        drive = new Drive(frontLeftDriveMotor, frontRightDriveMotor, rearLeftDriveMotor, rearRightDriveMotor, intake, launch1, launch2b, imu, opMode, timer);
 
 //        drive.setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //        drive.setRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

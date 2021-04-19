@@ -15,6 +15,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 
+import static java.lang.Thread.sleep;
+
 /** Mecanum drivetrain subsystem */
 public class Drive extends Subsystem {
     private HardwareMap hardwareMap;
@@ -24,6 +26,11 @@ public class Drive extends Subsystem {
     public DcMotorEx frontRight;
     public DcMotorEx rearLeft;
     public DcMotorEx rearRight;
+
+    // use motor encoder for odometry
+    public DcMotorEx odL;
+    public DcMotorEx odB;
+    public DcMotorEx odR;
 
     //Sensors
     private BNO055IMU imu;
@@ -36,6 +43,16 @@ public class Drive extends Subsystem {
     private int encoderOffsetFR = 0;
     private int encoderOffsetRL = 0;
     private int encoderOffsetRR = 0;
+
+    private int odometryCountOffsetL = 0;
+    private int odometryCountOffsetR = 0;
+    private int odometryCountOffsetB = 0;
+    private int odometryCountL = 0;
+    private int odometryCountR = 0;
+    private int odometryCountB = 0;
+    private static final double ODOMETRY_mm_PER_COUNT               = 38.85*3.14159265/8192.0;
+    private static final double ODOMETRY_RADIUS_X                   = 201.0;
+    private static final double ODOMETRY_RADIUS_Y                   = 178.0;
 
     //DO WITH ENCODERS
     private static final double     DRIVE_GEAR_REDUCTION            = 1.0 ;     // This is < 1.0 if geared UP
@@ -81,11 +98,14 @@ public class Drive extends Subsystem {
 
     private long startTime;
 
-    public Drive(DcMotorEx frontLeft, DcMotorEx frontRight, DcMotorEx rearLeft, DcMotorEx rearRight, BNO055IMU imu, LinearOpMode opMode, ElapsedTime timer) {
+    public Drive(DcMotorEx frontLeft, DcMotorEx frontRight, DcMotorEx rearLeft, DcMotorEx rearRight, DcMotorEx odL, DcMotorEx odB, DcMotorEx odR, BNO055IMU imu, LinearOpMode opMode, ElapsedTime timer) {
         this.frontLeft = frontLeft;
         this.frontRight = frontRight;
         this.rearLeft = rearLeft;
         this.rearRight = rearRight;
+        this.odL = odL;
+        this.odB = odB;
+        this.odR = odR;
         this.opMode = opMode;
         this.hardwareMap = opMode.hardwareMap;
         this.imu = imu;
@@ -93,6 +113,32 @@ public class Drive extends Subsystem {
         setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
+    private int getOdometryCountL() {
+        odometryCountL = -odL.getCurrentPosition() - odometryCountOffsetL;
+        return odometryCountL;
+    }
+
+    private int getOdometryCountB() {
+        odometryCountB = odB.getCurrentPosition() - odometryCountOffsetB;
+        return odometryCountB;
+    }
+
+    private int getOdometryCountR() {
+        odometryCountR = odR.getCurrentPosition() - odometryCountOffsetR;
+        return odometryCountR;
+    }
+
+    private void resetOdometry() {
+        odometryCountOffsetL = -odL.getCurrentPosition();
+        odometryCountOffsetB = odB.getCurrentPosition();
+        odometryCountOffsetR = odR.getCurrentPosition();
+    }
+
+    private void updateOdometry() {
+        getOdometryCountL();
+        getOdometryCountB();
+        getOdometryCountR();
+    }
 
     public double getAngularVMaxNeverrest20(){
         return ANGULAR_V_MAX_NEVERREST_20;
@@ -444,11 +490,12 @@ public class Drive extends Subsystem {
 //        sleep(100);
     }
 
-    public void moveForward(double distance) {
-        moveForward(distance, DRIVE_SPEED_Y);
+    public void moveForward_odometry(double distance) throws InterruptedException {
+        moveForward_odometry(distance, DRIVE_SPEED_Y);
     }
 
-    public void moveForward(double distance, double motorSpeed) {
+    public void moveForward_odometry(double distance, double motorSpeed) throws InterruptedException {
+        resetOdometry();
 //        this.moveToPos2D(motorSpeed, 0.0, distance);
         allMotorPIDControl( (int) (distance*COUNTS_PER_MM * COUNTS_CORRECTION_Y), motorSpeed * ANGULAR_V_MAX_NEVERREST_20, ANGULAR_V_MAX_NEVERREST_20,
                 motorRampTime, true, true, true, true, motorKp, motorKi, motorKd);
@@ -456,7 +503,72 @@ public class Drive extends Subsystem {
         robotCurrentPosY += distance * Math.sin(robotCurrentAngle*Math.PI/180.0);
         // Display it for the driver.
         opMode.telemetry.addData("moveForward",  "move to %7.2f, %7.2f", robotCurrentPosX,  robotCurrentPosY);
+        updateOdometry();
+        opMode.telemetry.addData("odometry",  " L %7.2f R %7.2f B %7.2f", odometryCountL*ODOMETRY_mm_PER_COUNT, odometryCountR*ODOMETRY_mm_PER_COUNT, odometryCountB*ODOMETRY_mm_PER_COUNT);
         opMode.telemetry.update();
+//        sleep(1000);
+        double angleError = (((double) odometryCountR) - ((double) odometryCountL))*0.5*ODOMETRY_mm_PER_COUNT*(180.0/3.14159265)/ODOMETRY_RADIUS_X;
+        turnRobotByTick(-angleError);
+        updateOdometry();
+        opMode.telemetry.addData("correction angle",  " %7.2f", -angleError);
+        opMode.telemetry.addData("odometry",  " L %7.2f R %7.2f B %7.2f", odometryCountL*ODOMETRY_mm_PER_COUNT, odometryCountR*ODOMETRY_mm_PER_COUNT, odometryCountB*ODOMETRY_mm_PER_COUNT);
+        opMode.telemetry.update();
+        if (odometryCountB*ODOMETRY_mm_PER_COUNT > 25.0) {
+            moveLeft(odometryCountB*ODOMETRY_mm_PER_COUNT);
+        }
+        if (odometryCountB*ODOMETRY_mm_PER_COUNT < -25.0) {
+            moveRight(-odometryCountB*ODOMETRY_mm_PER_COUNT);
+        }
+//        sleep(1000);
+//        sleep(100);
+    }
+
+    public void moveForward(double distance) {
+        moveForward(distance, DRIVE_SPEED_Y);
+    }
+
+    public void moveForward(double distance, double motorSpeed) {
+ //        this.moveToPos2D(motorSpeed, 0.0, distance);
+        allMotorPIDControl( (int) (distance*COUNTS_PER_MM * COUNTS_CORRECTION_Y), motorSpeed * ANGULAR_V_MAX_NEVERREST_20, ANGULAR_V_MAX_NEVERREST_20,
+                motorRampTime, true, true, true, true, motorKp, motorKi, motorKd);
+        robotCurrentPosX += distance * Math.cos(robotCurrentAngle*Math.PI/180.0);
+        robotCurrentPosY += distance * Math.sin(robotCurrentAngle*Math.PI/180.0);
+        // Display it for the driver.
+        opMode.telemetry.addData("moveForward",  "move to %7.2f, %7.2f", robotCurrentPosX,  robotCurrentPosY);
+        opMode.telemetry.update();
+//        sleep(100);
+    }
+
+    public void moveBackward_odometry(double distance) throws InterruptedException {
+        moveBackward_odometry(distance, DRIVE_SPEED_Y);
+    }
+
+    public void moveBackward_odometry(double distance, double motorSpeed) throws InterruptedException {
+        resetOdometry();
+//        this.moveToPos2D(motorSpeed, 0.0, -distance);
+        allMotorPIDControl((int) (distance*COUNTS_PER_MM * COUNTS_CORRECTION_Y), motorSpeed * ANGULAR_V_MAX_NEVERREST_20, ANGULAR_V_MAX_NEVERREST_20,
+                motorRampTime, false, false, false, false, motorKp, motorKi, motorKd);
+        robotCurrentPosX += distance * Math.cos((robotCurrentAngle+180.0)*Math.PI/180.0);
+        robotCurrentPosY += distance * Math.sin((robotCurrentAngle+180.0)*Math.PI/180.0);
+        // Display it for the driver.
+        opMode.telemetry.addData("moveBackward",  "move to %7.2f, %7.2f", robotCurrentPosX,  robotCurrentPosY);
+        updateOdometry();
+        opMode.telemetry.addData("odometry",  " L %7.2f R %7.2f B %7.2f", odometryCountL*ODOMETRY_mm_PER_COUNT, odometryCountR*ODOMETRY_mm_PER_COUNT, odometryCountB*ODOMETRY_mm_PER_COUNT);
+        opMode.telemetry.update();
+//        sleep(1000);
+        double angleError = (((double) odometryCountR) - ((double) odometryCountL))*0.5*ODOMETRY_mm_PER_COUNT*(180.0/3.14159265)/ODOMETRY_RADIUS_X;
+        turnRobotByTick(-angleError);
+        updateOdometry();
+        opMode.telemetry.addData("correction angle",  " %7.2f", -angleError);
+        opMode.telemetry.addData("odometry",  " L %7.2f R %7.2f B %7.2f", odometryCountL*ODOMETRY_mm_PER_COUNT, odometryCountR*ODOMETRY_mm_PER_COUNT, odometryCountB*ODOMETRY_mm_PER_COUNT);
+        opMode.telemetry.update();
+        if (odometryCountB*ODOMETRY_mm_PER_COUNT > 25.0) {
+            moveLeft(odometryCountB*ODOMETRY_mm_PER_COUNT);
+        }
+        if (odometryCountB*ODOMETRY_mm_PER_COUNT < -25.0) {
+            moveRight(-odometryCountB*ODOMETRY_mm_PER_COUNT);
+        }
+//        sleep(1000);
 //        sleep(100);
     }
 
@@ -476,6 +588,40 @@ public class Drive extends Subsystem {
 //        sleep(100);
     }
 
+    public void moveLeft_odometry(double distance) throws InterruptedException {
+        moveLeft_odometry(distance, DRIVE_SPEED_X);
+    }
+
+    public void moveLeft_odometry(double distance, double motorSpeed) throws InterruptedException {
+        resetOdometry();
+//        this.moveToPos2D(motorSpeed, -distance, 0.0);
+        allMotorPIDControl((int) (distance*COUNTS_PER_MM * COUNTS_CORRECTION_X), motorSpeed * ANGULAR_V_MAX_NEVERREST_20, ANGULAR_V_MAX_NEVERREST_20,
+                motorRampTime, false, true, true, false, motorKp, motorKi, motorKd);
+        robotCurrentPosX += distance * Math.cos((robotCurrentAngle+90.0)*Math.PI/180.0);
+        robotCurrentPosY += distance * Math.sin((robotCurrentAngle+90.0)*Math.PI/180.0);
+        // Display it for the driver.
+        opMode.telemetry.addData("moveLeft",  "move to %7.2f, %7.2f", robotCurrentPosX,  robotCurrentPosY);
+        updateOdometry();
+        opMode.telemetry.addData("odometry",  " L %7.2f R %7.2f B %7.2f", odometryCountL*ODOMETRY_mm_PER_COUNT, odometryCountR*ODOMETRY_mm_PER_COUNT, odometryCountB*ODOMETRY_mm_PER_COUNT);
+        opMode.telemetry.update();
+//        sleep(1000);
+        double angleError = (((double) odometryCountR) - ((double) odometryCountL))*0.5*ODOMETRY_mm_PER_COUNT*(180.0/3.14159265)/ODOMETRY_RADIUS_X;
+        turnRobotByTick(-angleError);
+        updateOdometry();
+        opMode.telemetry.addData("correction angle",  " %7.2f", -angleError);
+        opMode.telemetry.addData("odometry",  " L %7.2f R %7.2f B %7.2f", odometryCountL*ODOMETRY_mm_PER_COUNT, odometryCountR*ODOMETRY_mm_PER_COUNT, odometryCountB*ODOMETRY_mm_PER_COUNT);
+        opMode.telemetry.update();
+        double offsetY = (((double) odometryCountR) + ((double) odometryCountL))*0.5;
+        if (offsetY*ODOMETRY_mm_PER_COUNT > 25.0) {
+            moveBackward(offsetY*ODOMETRY_mm_PER_COUNT);
+        }
+        if (offsetY*ODOMETRY_mm_PER_COUNT < -25.0) {
+            moveForward(-offsetY*ODOMETRY_mm_PER_COUNT);
+        }
+//        sleep(1000);
+//        sleep(100);
+    }
+
     public void moveLeft(double distance) {
         moveLeft(distance, DRIVE_SPEED_X);
     }
@@ -489,6 +635,40 @@ public class Drive extends Subsystem {
         // Display it for the driver.
         opMode.telemetry.addData("moveLeft",  "move to %7.2f, %7.2f", robotCurrentPosX,  robotCurrentPosY);
         opMode.telemetry.update();
+//        sleep(100);
+    }
+
+    public void moveRight_odometry(double distance) throws InterruptedException {
+        moveRight_odometry(distance, DRIVE_SPEED_X);
+    }
+
+    public void moveRight_odometry(double distance, double motorSpeed) throws InterruptedException {
+        resetOdometry();
+//        this.moveToPos2D(motorSpeed, distance, 0.0);
+        allMotorPIDControl((int) (distance*COUNTS_PER_MM * COUNTS_CORRECTION_X), motorSpeed * ANGULAR_V_MAX_NEVERREST_20, ANGULAR_V_MAX_NEVERREST_20,
+                motorRampTime, true, false, false, true, motorKp, motorKi, motorKd);
+        robotCurrentPosX += distance * Math.cos((robotCurrentAngle-90.0)*Math.PI/180.0);
+        robotCurrentPosY += distance * Math.sin((robotCurrentAngle-90.0)*Math.PI/180.0);
+        // Display it for the driver.
+        opMode.telemetry.addData("moveRight",  "move to %7.2f, %7.2f", robotCurrentPosX,  robotCurrentPosY);
+        updateOdometry();
+        opMode.telemetry.addData("odometry",  " L %7.2f R %7.2f B %7.2f", odometryCountL*ODOMETRY_mm_PER_COUNT, odometryCountR*ODOMETRY_mm_PER_COUNT, odometryCountB*ODOMETRY_mm_PER_COUNT);
+        opMode.telemetry.update();
+//        sleep(1000);
+        double angleError = (((double) odometryCountR) - ((double) odometryCountL))*0.5*ODOMETRY_mm_PER_COUNT*(180.0/3.14159265)/ODOMETRY_RADIUS_X;
+        turnRobotByTick(-angleError);
+        updateOdometry();
+        opMode.telemetry.addData("correction angle",  " %7.2f", -angleError);
+        opMode.telemetry.addData("odometry",  " L %7.2f R %7.2f B %7.2f", odometryCountL*ODOMETRY_mm_PER_COUNT, odometryCountR*ODOMETRY_mm_PER_COUNT, odometryCountB*ODOMETRY_mm_PER_COUNT);
+        opMode.telemetry.update();
+        double offsetY = (((double) odometryCountR) + ((double) odometryCountL))*0.5;
+        if (offsetY*ODOMETRY_mm_PER_COUNT > 25.0) {
+            moveBackward(offsetY*ODOMETRY_mm_PER_COUNT);
+        }
+        if (offsetY*ODOMETRY_mm_PER_COUNT < -25.0) {
+            moveForward(-offsetY*ODOMETRY_mm_PER_COUNT);
+        }
+//        sleep(1000);
 //        sleep(100);
     }
 
@@ -581,7 +761,7 @@ public class Drive extends Subsystem {
         int currentCountRR = rearRight.getCurrentPosition();
         double currentTimeRR = ((double) (timer.nanoseconds() - startTime)) * 1.0e-6;
         String output = String.format("FL %.3f, %d, FR %.3f %d, RL %.3f %d, RR %.3f %d",
-                currentTimeFL, currentCountFL, currentCountFR, currentCountFR, currentCountRL, currentCountRL, currentCountRR, currentCountRR);
+                currentTimeFL, currentCountFL, currentTimeFR, currentCountFR, currentTimeRL, currentCountRL, currentTimeRR, currentCountRR);
         Log.d("motorEnc", output);
     }
 

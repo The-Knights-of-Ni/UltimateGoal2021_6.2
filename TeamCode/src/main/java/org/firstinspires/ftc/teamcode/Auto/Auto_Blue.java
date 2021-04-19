@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.internal.camera.delegating.DelegatingCaptureSequence;
+import org.firstinspires.ftc.teamcode.Subsystems.LauncherThread;
 import org.firstinspires.ftc.teamcode.Subsystems.Robot;
 import org.openftc.easyopencv.OpenCvCamera;
 
@@ -55,8 +57,19 @@ public class Auto_Blue extends LinearOpMode {
     private VuforiaLocalizer vuforia = null;
 
     private boolean targetVisible = false;
+    private static final int MAX_ITERATION = 40;
+    private static final double towerOffsetTargetX = -360.0;
+    private static final double towerOffsetTargetY = -1743.0;
+    private static final double towerOffsetTargetAngle = -0.6;
 
-    private double launchPos;
+    private double launchPosY = 56.0;
+    private double launchPosX = 11.0;
+    private double secondGoalX = 36.5;
+    private double secondGoalY = 12.0;
+    private double firstGoalDropOffsetX = 2.0;
+    private double firstGoalDropOffsetY = 2.0;
+    private double secondGoalDropOffsetX = 6.0;
+    private double secondGoalDropOffsetY = 3.0;
 
     private void initOpMode() throws IOException {
         telemetry.addData("Init Robot", "");
@@ -78,8 +91,16 @@ public class Auto_Blue extends LinearOpMode {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        Thread launcherThread = new LauncherThread(this, robot);
+        robot.control.setLauncherTargetRPM(0.0);
+
+        telemetry.addLine("WaitForStart");
+        telemetry.update();
         waitForStart();
         telemetry.addLine("afterWaitForStart");
+
+        launcherThread.start();
 
         //Detect rings
         String numRings = null;
@@ -102,78 +123,323 @@ public class Auto_Blue extends LinearOpMode {
         }
         telemetry.addLine("afterDetectRings");
 
-        // start launcher motors
-        startLauncher();
+        if (numRings.equals("ZERO") || numRings.equals("ONE")) {
+            // start launcher motors
+            startLauncher(1500.0);
 
-        // deploy claw and grab wobble goal
+            // deploy claw and grab wobble goal
 //        robot.control.openWobbleGoalClaw();   // claws are already open at startup
-        robot.control.raiseWobbleGoalArmLow();
-        sleep(500);
-        robot.control.closeWobbleGoalClaw();
-        sleep(500);
-        robot.control.raiseWobbleGoalArmMed();
-        sleep(500);
+            robot.control.raiseWobbleGoalArmLow();
+            sleep(300);
+            robot.control.closeWobbleGoalClaw();
+            sleep(500);
+            robot.control.raiseWobbleGoalArmMed();
+            sleep(300);
 
-        // move to launch line
-        launchPos = 56.0;
-        robot.drive.moveForward(launchPos*mmPerInch);
+            // move to launch line
+            robot.drive.moveForward_odometry(launchPosY*mmPerInch, 0.5);
 
-        // launch rings
-        launchRings();
+            // look for Tower VuMark
+            int vIteration = 0;
+            while ((!robot.vision.towerTargetScan()) && (vIteration < MAX_ITERATION)) {
+                vIteration = vIteration + 1;
+                sleep(50);
+            }
+            telemetry.addData("tower ", " first %d not found", vIteration);
+            telemetry.update();
+//        sleep(2000);
 
-        stopLauncher();
+            // use Tower VuMark to correct robot position
+            double towerOffsetX = towerOffsetTargetX;
+            double towerOffsetY = towerOffsetTargetY;
+            double towerOffsetAngle = towerOffsetTargetAngle;
+            if (vIteration < MAX_ITERATION) {
+                towerOffsetX = robot.vision.getTowerOffsetX();
+                towerOffsetY = robot.vision.getTowerOffsetY();
+                towerOffsetAngle = robot.vision.getTowerOffsetAngle();
+            }
+            telemetry.addData("tower offset", " X %.1f Y %.1f Angle %.1f", towerOffsetX, towerOffsetY, towerOffsetAngle);
+            telemetry.update();
+//        sleep(2000);
+            if (towerOffsetAngle > 90.0) {
+                towerOffsetAngle = towerOffsetAngle - 180.0;
+            }
+            if (towerOffsetAngle < -90.0) {
+                towerOffsetAngle = towerOffsetAngle + 180.0;
+            }
+            robot.drive.turnRobotByTick( -(towerOffsetAngle - towerOffsetTargetAngle));
 
-        if(numRings.equals("ZERO")) {
-            robot.drive.moveForward((70.75-launchPos)*mmPerInch);
+            robot.drive.moveRight_odometry(launchPosX*mmPerInch - (towerOffsetX - towerOffsetTargetX));
+//        sleep(5000);
+            // launch rings
+//        launchThreeRings();
+
+            // scoop rings to the back
+            robot.control.closeIntakeToElevator();
+            sleep(600);
+            robot.control.openIntakeToElevator();
+            sleep(150);
+
+            // raise elevator
+            robot.control.moveElevator(1);
+            sleep(800);
+
+            // launch first ring
+            robot.control.launchOneRing();
+//        sleep(1000);
+            robot.drive.moveRight_odometry(7.5*mmPerInch);
+
+            // launch second ring
+            robot.control.launchOneRing();
+//        sleep(1000);
+            robot.drive.moveRight_odometry(7.5*mmPerInch);
+
+            // launch third ring
+            robot.control.launchOneRing();
+
+            // lower elevator to floor
+            robot.control.moveElevatorToBottom();
+
+            stopLauncher();
+
+            // go to target zone to drop the first goal
+            if(numRings.equals("ZERO")) {
+                robot.drive.moveForward_odometry((70.75-launchPosY+firstGoalDropOffsetY)*mmPerInch, 0.65);
+                robot.drive.moveLeft_odometry((launchPosX+15.0+firstGoalDropOffsetX)*mmPerInch, 0.45);
+            }
+            else if(numRings.equals("ONE")) {
+                robot.drive.moveForward_odometry((94.25-launchPosY+firstGoalDropOffsetY)*mmPerInch, 0.65);
+                robot.drive.moveLeft_odometry(((launchPosX+15.0+firstGoalDropOffsetX)-22.75)*mmPerInch, 0.45);
+            }
+            else {
+                robot.drive.moveForward_odometry((117.75-launchPosY+firstGoalDropOffsetY)*mmPerInch, 0.65);
+                robot.drive.moveLeft_odometry((launchPosX+15.0+firstGoalDropOffsetX)*mmPerInch, 0.45);
+            }
+
+            launcherThread.interrupt();
+
+            // deploy claw and drop wobble goal
+            robot.control.raiseWobbleGoalArmLow();
+            sleep(50);
+            robot.control.openWideWobbleGoalClaw();
+            sleep(200);
+
+
+            if(numRings.equals("ZERO")) {
+                robot.drive.moveRight_odometry((secondGoalX+firstGoalDropOffsetX)*mmPerInch, 0.45);
+                robot.control.moveWobbleGoalArmDown();
+                robot.drive.moveBackward_odometry((70.75-secondGoalY+firstGoalDropOffsetY)*mmPerInch, 0.65);
+            }
+            else if(numRings.equals("ONE")) {
+                robot.drive.moveRight_odometry((secondGoalX-22.75+firstGoalDropOffsetX)*mmPerInch,0.45);
+                robot.control.moveWobbleGoalArmDown();
+                robot.drive.moveBackward_odometry((94.25-secondGoalY+firstGoalDropOffsetY)*mmPerInch, 0.65);
+            }
+            else {
+                robot.drive.moveRight_odometry((secondGoalX+firstGoalDropOffsetX)*mmPerInch, 0.45);
+                robot.control.moveWobbleGoalArmDown();
+                robot.drive.moveBackward_odometry((117.75-secondGoalY+firstGoalDropOffsetY)*mmPerInch, 0.65);
+            }
+
+            // deploy claw and grab wobble goal
+            robot.control.raiseWobbleGoalArmMed();
+            sleep(400);
+            robot.control.closeWobbleGoalClaw();
+            sleep(400);
+            robot.control.raiseWobbleGoalArmHigh();
+            sleep(300);
+
+
+            if(numRings.equals("ZERO")) {
+                robot.drive.moveForward_odometry((70.75-secondGoalY-secondGoalDropOffsetY)*mmPerInch, 0.65);
+                robot.drive.moveLeft_odometry((secondGoalX-secondGoalDropOffsetX)*mmPerInch, 0.45);
+            }
+            else if(numRings.equals("ONE")) {
+                robot.drive.moveForward_odometry((94.25-secondGoalY-secondGoalDropOffsetY)*mmPerInch, 0.65);
+                robot.drive.moveLeft_odometry((secondGoalX-secondGoalDropOffsetX-22.75)*mmPerInch, 0.45);
+            }
+            else {
+                robot.drive.moveForward_odometry((117.75-secondGoalY-secondGoalDropOffsetY)*mmPerInch, 0.65);
+                robot.drive.moveLeft_odometry((secondGoalX-secondGoalDropOffsetX)*mmPerInch, 0.45);
+            }
+
+            // deploy claw and drop wobble goal
+            robot.control.raiseWobbleGoalArmMed();
+            sleep(50);
+            robot.control.openWideWobbleGoalClaw();
+            sleep(100);
+            robot.control.moveWobbleGoalArmDown();
+            sleep(350);
+
+            // park robot
+            if(numRings.equals("ZERO")) {
+                // align robot
+                robot.drive.moveForward_odometry((3.0+secondGoalDropOffsetY)*mmPerInch);
+            }
+            else if(numRings.equals("ONE")) {
+                robot.drive.moveBackward_odometry((94.25-70.75-secondGoalDropOffsetY-4.0)*mmPerInch, 0.65);
 //            robot.drive.moveRight(22.75/2*mmPerInch);
-        }
-        else if(numRings.equals("ONE")) {
-            robot.drive.moveForward((94.25-launchPos)*mmPerInch);
-            robot.drive.moveRight(22.75*mmPerInch);
-        }
-        else {
-            robot.drive.moveForward((117.75-launchPos)*mmPerInch);
-//            robot.drive.moveRight(22.75/2*mmPerInch);
-        }
-
-        // deploy claw and drop wobble goal
-        robot.control.raiseWobbleGoalArmLow();
-        sleep(500);
-        robot.control.openWideWobbleGoalClaw();
-        sleep(500);
-        robot.control.moveWobbleGoalArmDown();
-        sleep(500);
-
-
-        // park robot
-        if(numRings.equals("ZERO")) {
-            // align robot
-            robot.drive.moveForward(3.0*mmPerInch);
-        }
-        else if(numRings.equals("ONE")) {
-            robot.drive.moveBackward((94.25-70.75-3.0)*mmPerInch);
-//            robot.drive.moveRight(22.75/2*mmPerInch);
-        }
-        else {
-            robot.drive.moveBackward((117.75-70.75-3.0)*mmPerInch);
+            }
+            else {
+                robot.drive.moveBackward_odometry((117.75-70.75-secondGoalDropOffsetY-4.0)*mmPerInch, 0.65);
 //            robot.drive.moveLeft(22.75/2*mmPerInch);
-        }
+            }
 
 //        robot.drive.moveBackward(22.75/2 * mmPerInch);
 
+        }
+        else {
+            // four rings -> use high goal
+            // start launcher motors
+            startLauncher(1600.0);
+
+            // deploy claw and grab wobble goal
+//        robot.control.openWobbleGoalClaw();   // claws are already open at startup
+            robot.control.raiseWobbleGoalArmLow();
+            sleep(300);
+            robot.control.closeWobbleGoalClaw();
+            sleep(500);
+            robot.control.raiseWobbleGoalArmMed();
+            sleep(300);
+
+            // move to launch line
+            robot.drive.moveForward_odometry(launchPosY*mmPerInch, 0.5);
+
+            // look for Tower VuMark
+            int vIteration = 0;
+            while ((!robot.vision.towerTargetScan()) && (vIteration < MAX_ITERATION)) {
+                vIteration = vIteration + 1;
+                sleep(50);
+            }
+            telemetry.addData("tower ", " first %d not found", vIteration);
+            telemetry.update();
+//        sleep(2000);
+
+            // use Tower VuMark to correct robot position
+            double towerOffsetX = towerOffsetTargetX;
+            double towerOffsetY = towerOffsetTargetY;
+            double towerOffsetAngle = towerOffsetTargetAngle;
+            if (vIteration < MAX_ITERATION) {
+                towerOffsetX = robot.vision.getTowerOffsetX();
+                towerOffsetY = robot.vision.getTowerOffsetY();
+                towerOffsetAngle = robot.vision.getTowerOffsetAngle();
+            }
+            telemetry.addData("tower offset", " X %.1f Y %.1f Angle %.1f", towerOffsetX, towerOffsetY, towerOffsetAngle);
+            telemetry.update();
+//        sleep(2000);
+            if (towerOffsetAngle > 90.0) {
+                towerOffsetAngle = towerOffsetAngle - 180.0;
+            }
+            if (towerOffsetAngle < -90.0) {
+                towerOffsetAngle = towerOffsetAngle + 180.0;
+            }
+            robot.drive.turnRobotByTick( -(towerOffsetAngle - towerOffsetTargetAngle));
+
+            // launch rings
+            launchThreeRings();
+
+            stopLauncher();
+
+            // go to target zone to drop the first goal
+            if(numRings.equals("ZERO")) {
+                robot.drive.moveForward_odometry((70.75-launchPosY+firstGoalDropOffsetY)*mmPerInch, 0.55);
+//                robot.drive.moveLeft_odometry((launchPosX+15.0+firstGoalDropOffsetX)*mmPerInch, 0.45);
+            }
+            else if(numRings.equals("ONE")) {
+                robot.drive.moveForward_odometry((94.25-launchPosY+firstGoalDropOffsetY)*mmPerInch, 0.55);
+                robot.drive.moveRight_odometry((22.75)*mmPerInch, 0.45);
+            }
+            else {
+                robot.drive.moveForward_odometry((117.75-launchPosY+firstGoalDropOffsetY)*mmPerInch, 0.55);
+//                robot.drive.moveLeft_odometry((launchPosX+15.0+firstGoalDropOffsetX)*mmPerInch, 0.45);
+            }
+
+            launcherThread.interrupt();
+
+            // deploy claw and drop wobble goal
+            robot.control.raiseWobbleGoalArmLow();
+            sleep(50);
+            robot.control.openWideWobbleGoalClaw();
+            sleep(200);
+
+
+            if(numRings.equals("ZERO")) {
+                robot.drive.moveRight_odometry((secondGoalX)*mmPerInch, 0.45);
+                robot.control.moveWobbleGoalArmDown();
+                robot.drive.moveBackward_odometry((70.75-secondGoalY+firstGoalDropOffsetY)*mmPerInch, 0.55);
+            }
+            else if(numRings.equals("ONE")) {
+                robot.drive.moveRight_odometry((secondGoalX-22.75)*mmPerInch,0.45);
+                robot.control.moveWobbleGoalArmDown();
+                robot.drive.moveBackward_odometry((94.25-secondGoalY+firstGoalDropOffsetY)*mmPerInch, 0.55);
+            }
+            else {
+                robot.drive.moveRight_odometry((secondGoalX)*mmPerInch, 0.45);
+                robot.control.moveWobbleGoalArmDown();
+                robot.drive.moveBackward_odometry((117.75-secondGoalY+firstGoalDropOffsetY)*mmPerInch, 0.55);
+            }
+
+            // deploy claw and grab wobble goal
+            robot.control.raiseWobbleGoalArmMed();
+            sleep(400);
+            robot.control.closeWobbleGoalClaw();
+            sleep(400);
+            robot.control.raiseWobbleGoalArmHigh();
+            sleep(300);
+
+
+            if(numRings.equals("ZERO")) {
+                robot.drive.moveForward_odometry((70.75-secondGoalY-secondGoalDropOffsetY)*mmPerInch, 0.55);
+                robot.drive.moveLeft_odometry((secondGoalX-secondGoalDropOffsetX)*mmPerInch, 0.45);
+            }
+            else if(numRings.equals("ONE")) {
+                robot.drive.moveForward_odometry((94.25-secondGoalY-secondGoalDropOffsetY)*mmPerInch, 0.55);
+                robot.drive.moveLeft_odometry((secondGoalX-secondGoalDropOffsetX-22.75)*mmPerInch, 0.45);
+            }
+            else {
+                robot.drive.moveForward_odometry((117.75-secondGoalY-secondGoalDropOffsetY)*mmPerInch, 0.55);
+                robot.drive.moveLeft_odometry((secondGoalX-secondGoalDropOffsetX)*mmPerInch, 0.45);
+            }
+
+            // deploy claw and drop wobble goal
+            robot.control.raiseWobbleGoalArmMed();
+            sleep(50);
+            robot.control.openWideWobbleGoalClaw();
+            sleep(100);
+            robot.control.moveWobbleGoalArmDown();
+            sleep(350);
+
+            // park robot
+            if(numRings.equals("ZERO")) {
+                // align robot
+                robot.drive.moveForward_odometry((3.0+secondGoalDropOffsetY)*mmPerInch);
+            }
+            else if(numRings.equals("ONE")) {
+                robot.drive.moveBackward_odometry((94.25-70.75-secondGoalDropOffsetY-4.0)*mmPerInch, 0.55);
+//            robot.drive.moveRight(22.75/2*mmPerInch);
+            }
+            else {
+                robot.drive.moveBackward_odometry((117.75-70.75-secondGoalDropOffsetY-4.0)*mmPerInch, 0.55);
+//            robot.drive.moveLeft(22.75/2*mmPerInch);
+            }
+
+//        robot.drive.moveBackward(22.75/2 * mmPerInch);
+
+        }
+
     }
 
-    private void startLauncher() {
+    private void startLauncher(double launcherRPM) {
         // start launcher
-        robot.control.setLaunchVelocity(-800.0); //722
+        robot.control.setLauncherTargetRPM(launcherRPM);
     }
 
     private void stopLauncher() {
         // start launcher
-        robot.control.setLaunchVelocity(0.0);
+        robot.control.setLauncherTargetRPM(0.0);
     }
 
-    private void launchRings() throws InterruptedException {
+    private void launchThreeRings() throws InterruptedException {
 
 //        // start launcher
 //        robot.control.setLaunchVelocity(-800.0); //722
@@ -185,19 +451,19 @@ public class Auto_Blue extends LinearOpMode {
         robot.control.closeIntakeToElevator();
         sleep(600);
         robot.control.openIntakeToElevator();
-        sleep(400);
+        sleep(150);
 
         // raise elevator
         robot.control.moveElevator(1);
-        sleep(1000);
+        sleep(800);
 
         // launch first ring
         robot.control.launchOneRing();
-        sleep(1000);
+        sleep(800);
 
         // launch second ring
         robot.control.launchOneRing();
-        sleep(1000);
+        sleep(800);
 
         // launch third ring
         robot.control.launchOneRing();
@@ -206,4 +472,5 @@ public class Auto_Blue extends LinearOpMode {
         robot.control.moveElevatorToBottom();
 
     }
+
 }

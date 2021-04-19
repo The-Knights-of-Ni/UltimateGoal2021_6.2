@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Auto;
 
 import com.arcrobotics.ftclib.vision.UGContourRingPipeline;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -13,6 +14,7 @@ import org.openftc.easyopencv.OpenCvCamera;
 import java.io.IOException;
 
 @Autonomous(name = "Auto Red")
+@Disabled
 public class Auto_Red extends LinearOpMode {
     private Robot robot;
     public ElapsedTime timer;

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Vision;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -22,6 +23,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.
  */
 
 @TeleOp(name="Tower Detection")
+@Disabled
 public class TowerDetection extends LinearOpMode {
     private static final boolean isBlue = true;
 

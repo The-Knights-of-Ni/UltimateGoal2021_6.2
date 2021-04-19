@@ -105,9 +105,9 @@ Control extends Subsystem {
     private static final double     WB_CLAW_POS_CLOSED                = 0;
 
     private static final double     WOBBLE_GOAL_ARM_DOWN         = 0.0;
-    private static final double     WOBBLE_GOAL_ARM_LOW          = 0.180;
-    private static final double     WOBBLE_GOAL_ARM_MED          = 0.320;
-    private static final double     WOBBLE_GOAL_ARM_HIGH          = 0.460;
+    private static final double     WOBBLE_GOAL_ARM_LOW          = 0.165;
+    private static final double     WOBBLE_GOAL_ARM_MED          = 0.300;
+    private static final double     WOBBLE_GOAL_ARM_HIGH          = 0.440;
 
 
 
@@ -167,11 +167,12 @@ Control extends Subsystem {
      * 3 = 1 Ring position
      */
 
+    private double launcherRPMLimit = 1800.0;
     private double launcherCurrentRPM;
     private double launcherTargetRPM;
-    private double launcherKp;
-    private double launcherKi;
-    private double launcherKd;
+    private double launcherKp = 0.005;
+    private double launcherKi = 0.000003;
+    private double launcherKd = 0.01;
 
 
 //    public Control(DcMotorEx intake, DcMotorEx launch1, DcMotorEx launch2, BNO055IMU imu, LinearOpMode opMode, ElapsedTime timer, ) {
@@ -377,6 +378,10 @@ Control extends Subsystem {
         launch2b.setVelocity(angularRate);
     }
 
+    public void setLauncherRPMLimit(double launcherRPM) { launcherRPMLimit = launcherRPM; }
+
+    public double getLauncherRPMLimit() { return launcherRPMLimit; }
+
     public void setLauncherCurrentRPM(double launcherRPM) { launcherCurrentRPM = launcherRPM; }
 
     public double getLauncherCurrentRPM() { return launcherCurrentRPM; }
@@ -464,10 +469,10 @@ Control extends Subsystem {
         launchLauncherFeeder1();
         sleep(200);
         moveElevatorLaunch();
-        sleep(200);
+        sleep(100);
         launchLauncherFeeder2();
         closeIntakeToElevator();
-        sleep(550);
+        sleep(500);
         restLauncherFeeder();
         openIntakeToElevator();
         sleep(355);

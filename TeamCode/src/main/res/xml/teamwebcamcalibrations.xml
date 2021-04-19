@@ -158,35 +158,22 @@
 
     <!-- ======================================================================================= -->
 
-    <!-- ELP USBFHD06H webcam, Calibrated by Andrew Chiang, 2021.04.15 using 3DF Zephyr -->
-    <Camera vid="0x05A3" pid="0x9422">
+    <!-- ELP USB8MP02G webcam, Calibrated by Andrew Chiang, 2021.04.17 using 3DF Zephyr -->
+    <Camera vid="0x32E4" pid="0x8830">
         <Calibration
             size="640, 480"
-            focalLength="946.751849065f, 946.751849065f"
-            principalPoint="312.532991973f, 257.602630157f"
-            distortionCoefficients="-0.402708643935, 0.170357090561, 0, 0, 0.182439621694, 0, 0, 0"
+            focalLength="785.305688338f, 785.305688331f"
+            principalPoint="314.525274325f, 225.298612482f"
+            distortionCoefficients="-0.38222660628, 0.331025528984, 0, 0, -0.368102739383, 0, 0, 0"
             />
 
-        <!-- <Calibration
+        <Calibration
             size="800, 600"
-            focalLength="1291.46350725f, 1291.46350725f"
-            principalPoint="422.267633202f, 257.602630157f"
-            distortionCoefficients="-0.439428417722, 0.718915543898, 0, 0, -2.18955718435, 0, 0, 0"
+            focalLength="983.181724417f, 983.181724414f"
+            principalPoint="394.130912666f, 312.977577944f"
+            distortionCoefficients="-0.380804740871, 0.226261366582, 0, 0, -0.0993669717528, 0, 0, 0"
             />
 
-        <Calibration
-            size="1280, 720"
-            focalLength="1526.19725326f, 1526.19725326f"
-            principalPoint="686.178242715f, 367.098026265f"
-            distortionCoefficients="-0.386015608832, 0.226256611624, 0, 0, -0.099523336965, 0, 0, 0"
-            />
-
-        <Calibration
-            size="1920, 1080"
-            focalLength="2272.75742272f, 2272.75742271f"
-            principalPoint="1002.33833621f, 564.265224843f"
-            distortionCoefficients="-0.390032928675, 0.253091618304, 0, 0, -0.157531871334, 0, 0, 0"
-            /> -->
 
     </Camera>
 

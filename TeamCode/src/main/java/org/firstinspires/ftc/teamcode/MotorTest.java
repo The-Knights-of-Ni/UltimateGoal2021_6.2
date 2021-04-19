@@ -36,11 +36,11 @@ public class MotorTest extends LinearOpMode {
     double targetRPM = 1460.0;
     double incrementRPM = 20.0;
     double incrementKp = 0.0002;
-    double incrementKi = 0.00001;
+    double incrementKi = 0.000001;
     double incrementKd = 0.0002;
     double Kp = 0.005;
-    double Ki = 0.001;
-    double Kd = 0.002;
+    double Ki = 0.000012;
+    double Kd = 0.01;
 
     private static final float mmPerInch        = 25.4f;
     private static final float mmTargetHeight   = (6) * mmPerInch;          // the height of the center of the target image above the floor
@@ -202,14 +202,14 @@ public class MotorTest extends LinearOpMode {
 
 //            telemetry.update();
 
-            int currentCountL1 = -robot.launch1.getCurrentPosition();
-            double currentTime = ((double) (timer.nanoseconds() - startTime)) * 1.0e-6;
-            int currentCountL2a = -robot.launch2a.getCurrentPosition();
-            int currentCountL2b = -robot.launch2b.getCurrentPosition();
-
-            String output = String.format("time %.3f launch1 %d launch2a %d launch2b %d",
-                    currentTime, currentCountL1, currentCountL2a, currentCountL2b);
-            Log.d("launcherEnc", output);
+//            int currentCountL1 = -robot.launch1.getCurrentPosition();
+//            double currentTime = ((double) (timer.nanoseconds() - startTime)) * 1.0e-6;
+//            int currentCountL2a = -robot.launch2a.getCurrentPosition();
+//            int currentCountL2b = -robot.launch2b.getCurrentPosition();
+//
+//            String output = String.format("time %.3f launch1 %d launch2a %d launch2b %d",
+//                    currentTime, currentCountL1, currentCountL2a, currentCountL2b);
+//            Log.d("launcherEnc", output);
         }
 
         intakeToElevatorThread.interrupt();

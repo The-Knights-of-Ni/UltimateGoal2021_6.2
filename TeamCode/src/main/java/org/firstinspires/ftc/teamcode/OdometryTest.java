@@ -46,6 +46,7 @@ import java.io.IOException;
  * created by Andrew Chiang on 3/26/2021
  */
 @TeleOp(name = "Odometry Test", group = "Sensor")
+@Disabled
 public class OdometryTest extends LinearOpMode {
 
     private Robot robot;

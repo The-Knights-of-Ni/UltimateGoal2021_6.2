@@ -108,13 +108,13 @@ public class Vision {
         viewportContainerIds = OpenCvCameraFactory.getInstance().splitLayoutForMultipleViewports(cameraMonitorViewId, 2, OpenCvCameraFactory.ViewportSplitMethod.HORIZONTALLY);
 
 
-        robot.getOpmode().telemetry.addLine("init Vuforia");
-        robot.getOpmode().telemetry.update();
-        initVuforia();
-
         robot.getOpmode().telemetry.addLine("init RingPipeline");
         robot.getOpmode().telemetry.update();
         initRingPipeline();
+
+        robot.getOpmode().telemetry.addLine("init Vuforia");
+        robot.getOpmode().telemetry.update();
+        initVuforia();
 
         robot.getOpmode().telemetry.addLine("vision init completed");
         robot.getOpmode().telemetry.update();
@@ -177,13 +177,25 @@ public class Vision {
 
             // express the rotation of the robot in degrees.
             targetRotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
-            robot.getOpmode().telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", targetRotation.firstAngle, targetRotation.secondAngle, targetRotation.thirdAngle);
+            robot.getOpmode().telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.1f, %.1f, %.1f", targetRotation.firstAngle, targetRotation.secondAngle, targetRotation.thirdAngle);
         }
         else {
             robot.getOpmode().telemetry.addData("Visible Target", "none");
         }
         robot.getOpmode().telemetry.update();
         return targetVisible;
+    }
+
+    public double getTowerOffsetX() {
+        return targetTranslation.get(0);
+    }
+
+    public double getTowerOffsetY() {
+        return targetTranslation.get(1);
+    }
+
+    public double getTowerOffsetAngle() {
+        return targetRotation.thirdAngle;
     }
 
     private void initRingPipeline() {

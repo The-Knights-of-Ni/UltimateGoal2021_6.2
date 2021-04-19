@@ -1,10 +1,15 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import android.annotation.SuppressLint;
+import android.util.Log;
+
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.List;
+
+import static java.lang.Math.abs;
 
 /**
  * launcher thread - control launcher motor RPM
@@ -24,7 +29,6 @@ public class LauncherThread extends Thread{
     private boolean isLauncherStarted;
     private boolean isLauncherRPMReliable;
     private double launcherRPM;
-    private static final double LAUNCHER_MAX_RPM = 1800.0;
 
 
     public LauncherThread(OpMode opMode, Robot robot) {
@@ -48,15 +52,17 @@ public class LauncherThread extends Thread{
         int evenValue = 0;
 
         boolean initialized = false;
+        boolean kiStart = false;
         double currentTime;
         double prevTime = 0.0;
         double targetRPM;
+        double maxRPM;
         double Kp, Ki, Kd;
         double currentError;
-        double alpha = 0.99;
+        double alpha = 0.995;
         double acculError = 0.0;
         double prevError = 0.0;
-        double errorSlope;
+        double errorSlope = 0.0;
         double currentPower;
 
 
@@ -69,10 +75,10 @@ public class LauncherThread extends Thread{
         // --------------------------------------------------------------------------------------
 
         // Set all Expansion hubs to use the AUTO Bulk Caching mode
-        for (LynxModule module : robot.allHubs) {
-            module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
-//            module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
-        }
+//        for (LynxModule module : robot.allHubs) {
+//            module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+////            module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+//        }
         try {
 
             while (!isInterrupted()) {
@@ -88,15 +94,27 @@ public class LauncherThread extends Thread{
                 Kp = robot.control.getLauncherKp();
                 Ki = robot.control.getLauncherKi();
                 Kd = robot.control.getLauncherKd();
+                maxRPM = robot.control.getLauncherRPMLimit();
 
                 currentError = launcherRPM - targetRPM;
+                if ((launcherRPM < 0.9*targetRPM) || (launcherRPM < 1.1*targetRPM)) {
+                    kiStart = false;
+                    acculError = 0.0;
+                }
                 if (initialized) { // after the first point, the previous data is valid
-                    acculError = acculError*alpha + currentError*(currentTime-prevTime);  // integrate error
+                    if (kiStart) {
+                        acculError = acculError*alpha + currentError*(currentTime-prevTime);  // integrate error
+                    }
+                    else {
+                        if (currentError > 0)
+                            kiStart = true;
+                    }
                     errorSlope = (currentError - prevError)/(currentTime-prevTime);         // error slope
-                    currentPower = launcherRPM/LAUNCHER_MAX_RPM - currentError*Kp - acculError*Ki - errorSlope*Kd; // apply PID correction
+                    currentPower = launcherRPM/maxRPM - currentError*Kp - acculError*Ki - errorSlope*Kd; // apply PID correction
                 }
                 else { // at the first point, use Kp only
-                    currentPower = launcherRPM/LAUNCHER_MAX_RPM - currentError*Kp;
+                    currentPower = launcherRPM/maxRPM - currentError*Kp;
+                    initialized = true;
                 }
                 if (currentPower > 1.0) currentPower = 1.0;
                 if (currentPower < 0.0) currentPower = 0.0;
@@ -106,8 +124,11 @@ public class LauncherThread extends Thread{
 
                 prevError = currentError;
                 prevTime = currentTime;
-                sleep(5);
+                sleep(10);
 
+                @SuppressLint("DefaultLocale") String output = String.format("time %.3f count %d RPM %.2f currentErr %.2f acculErr %.2f errorSlope %.2f power %.3f",
+                        currentTime, sampleEncoderValue[sampleDataIndex], launcherRPM, currentError, acculError, errorSlope, currentPower);
+                Log.d("launcherEnc", output);
             }
 
             evenValue += 2;

@@ -15,6 +15,7 @@ package org.firstinspires.ftc.teamcode;
 //import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -26,7 +27,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 @Autonomous(name="Drive PID")
-//@Disabled
+@Disabled
 public class DrivePID extends LinearOpMode
 {
     DcMotorEx frontLeftDriveMotor, frontRightDriveMotor, rearRightDriveMotor, rearLeftDriveMotor;
